@@ -1,0 +1,5 @@
+To convert mdv to cfradial:
+
+radar = pyart.io.read('yourfilepath')
+pyart.io.write_cfradial('newfile.nc', radar)
+

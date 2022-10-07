@@ -1,0 +1,206 @@
+#!/usr/bin/python3
+
+"""
+Extracts mean drop size diameter (Dm)  CFAD output from 
+allStorms_xxx_v12x_xxx.pro saved in 
+ .../classify/class_data/stats_class_v12x/Cfad_Dm/infoCfad_*.zip
+netcdf files and create new netcdf4 files.
+
+Stacy Brodzik, 12 May 2022
+Univ of Washington, Dept of Atmos Sciences
+"""
+
+import sys
+import os
+import glob
+from zipfile import ZipFile
+from netCDF4 import Dataset
+import netCDF4 as nc
+import numpy as np
+from datetime import datetime
+from datetime import timedelta
+
+if len(sys.argv) != 5:
+    errMsg = 'Usage: '+sys.argv[0]+' region[AFC|AKA|CIO|EPO|EUR|H01|H02|H03|H04|H05|NAM|NAS|SAM|SAS|WMP] year[YYYY] month[MM] thresLevel[str|mod]'
+    sys.exit(errMsg)
+else:
+    region = sys.argv[1]
+    iyear = sys.argv[2]
+    imonth = sys.argv[3]
+    thresLevel = sys.argv[4]
+
+verbose = True
+codeVersion = 'GPM2Ku7_uw4'
+gpmVersion = 'v07'
+if thresLevel == 'str':
+    features = {'Conv':'conv',
+                'ShallowIsol': 'shi',
+                'Stra':'stra'}
+elif thresLevel == 'mod':
+    features = {'Conv':'conv',
+                'Stra':'stra'} 
+data_type = 'grd'
+path_tmp='/virtual'
+convCoreTypes = ['DCC','WCC','DWC']
+types_out = np.array(convCoreTypes, dtype='object')
+
+missing_flt = -9999.
+missing_int = -9999
+
+regionDict = {'AFC':{'subdir':'afc_ku','long_name':'Africa','limits':[-40.,-30.,40.,60.]},
+              'AKA':{'subdir':'aka_ku','long_name':'Alaska','limits':[35.,-178.,67.,-115.]},
+              'CIO':{'subdir':'cio_ku','long_name':'Central Indian Ocean','limits':[-40.,55.,10.,110.]},           
+              'EPO':{'subdir':'epo_ku','long_name':'East Pacific Ocean','limits':[-67.,-178.,45.,-130.]},
+              'EUR':{'subdir':'eur_ku','long_name':'Europe','limits':[35.,-20.,67.,45.]},
+              'H01':{'subdir':'h01_ku','long_name':'Hole 01 (West Pacific Ocean)','limits':[-67.,-140.,25.,-85.]},
+              'H02':{'subdir':'h02_ku','long_name':'Hole 02 (North Atlantic Ocean)','limits':[15.,-65.,67.,-10.]},
+              'H03':{'subdir':'h03_ku','long_name':'Hole 03 (South of Africa)','limits':[-67.,-30.,-35.,75.]},
+              'H04':{'subdir':'h04_ku','long_name':'Hole 04 (South Indian Ocean)','limits':[-67.,70.,-35.,178.]},
+              'H05':{'subdir':'h05_ku','long_name':'Hole 05 (Western Pacific)','limits':[5.,125.,40.,178.]},
+              'NAM':{'subdir':'nam_ku','long_name':'North America','limits':[15.,-140.,67.,-55.]},
+              'NAS':{'subdir':'nas_ku','long_name':'North Asia','limits':[35.,40.,67.,178.]},
+              'SAM':{'subdir':'sam_ku','long_name':'South America','limits':[-67.,-95.,20.,-25.]},
+              'SAS':{'subdir':'sas_ku','long_name':'South Asia','limits':[5.,55.,40.,130.]},
+              'WMP':{'subdir':'wmp_ku','long_name':'Warm Pool','limits':[-40.,105.,10.,178.]}}
+
+if thresLevel == 'str':
+    inDir = '/home/disk/bob/gpm/'+regionDict[region]['subdir']+'/classify/class_data_v07/stats_class_v12s/Cfad_Dm'
+elif thresLevel == 'mod':
+    inDir = '/home/disk/bob/gpm/'+regionDict[region]['subdir']+'/classify/class_data_v07/stats_class_v12m/Cfad_Dm'
+
+outDirBase = '/home/disk/archive3/gpm/'+gpmVersion+'/'+region+'/cfad'
+if not os.path.isdir(outDirBase):
+    os.makedirs(outDirBase)
+
+os.chdir(inDir+'/'+imonth)
+
+# Get time in seconds since 1-Jan-1970
+time_str = iyear+imonth
+time_obj = datetime.strptime(time_str,'%Y%m')
+secs_since_1970 = int( (time_obj - datetime(1970,1,1)).total_seconds() )
+
+for ifeature in features.keys():
+        
+    for file in glob.glob('infoCfad_Dm_'+ifeature+'_EchoCores_*_'+iyear+'_*.zip'):
+
+        print('file = ',file)
+
+        prefix = os.path.splitext(file)[0]
+        #strParts = prefix.split('_')
+        [junk1,junk2,feature_long,junk3,month,year,junk4,version] = prefix.split('_')
+
+        # Open original netcdf file and read var info & global atts
+        with ZipFile(file, 'r') as zipObj:
+            zipObj.extractall(path_tmp)
+            
+        cdfFile = path_tmp+'/'+prefix+'.nc'
+        in_id =  Dataset(cdfFile,'r')
+
+        cfad_full = in_id.variables['Dm_CFAD_Full'][:]
+        cfad_core = in_id.variables['Dm_CFAD_Core'][:]
+        Dm        = in_id.variables['Dm'][:]
+        numDms    = len(Dm)
+        alt       = in_id.variables['altitude'][:]
+        numAlts   = len(alt)
+
+        title     = in_id.getncattr('Title')
+        source    = in_id.getncattr('source')
+        if ifeature == 'Conv':
+            etype = in_id.getncattr('echo_type')
+
+        in_id.close()
+        os.remove(cdfFile)
+
+        if verbose:
+            print('Done reading input file.')
+            print('Creating new nc file')
+
+        # Create new netcdf file
+        outDir = outDirBase+'/'+features[ifeature]+'/'+month
+        if not os.path.isdir(outDir):
+            os.makedirs(outDir)
+        cdfFile = outDir+'/'+codeVersion+'_DmCfad_'+features[ifeature]+'_'+thresLevel+'_'+data_type+'_'+year+month+'_'+region+'.nc'
+        id = Dataset(cdfFile,'w',format='NETCDF4')
+        
+        # Make dimensions
+        id.createDimension('time',None)
+        if ifeature == 'Conv':
+            id.createDimension('type_dim',len(convCoreTypes))
+            #id.createDimension('echo_type',len(convCoreTypes))
+        id.createDimension('alt_bin',numAlts)
+        id.createDimension('Dm_bin',numDms)
+        if verbose:
+            print('Done with dims')
+
+        # Define variables:
+        time_var_id = id.createVariable('time','i4',('time',),zlib=True,complevel=5)
+        time_var_id.units = 'seconds'
+        time_var_id.long_name = 'seconds since 1970-01-01'
+
+        if ifeature == 'Conv':
+            #type_var_id = id.createVariable('echo_type','i4',('echo_type',))
+            #type_var_id.units = 'none'
+            #type_var_id.long_name = 'convective core type'
+            type_var_id = id.createVariable('echo_type','str',('type_dim',))
+            type_var_id.units = 'none'
+            type_var_id.long_name = 'convective core type'
+            
+        alt_var_id = id.createVariable('altitude',np.float32,('alt_bin',),zlib=True,complevel=5)
+        alt_var_id.units = 'km'
+        alt_var_id.long_name = 'altitude bin value'
+
+        dm_var_id = id.createVariable('Dm','f4',('Dm_bin',),zlib=True,complevel=5)
+        dm_var_id.units = 'mm'
+        dm_var_id.long_name = 'Dm bin value'
+
+        full_var_id = id.createVariable('Dm_cfad_full','i4',('time','alt_bin','Dm_bin',),
+                                        fill_value=missing_int,zlib=True,complevel=5)
+        full_var_id.units = 'none'
+        full_var_id.long_name = 'Dm counts for full storm'
+
+        if ifeature == 'Conv':
+            #core_var_id = id.createVariable('Dm_cfad_core','i4',('time','echo_type','alt_bin','Dm_bin',),
+            core_var_id = id.createVariable('Dm_cfad_core','i4',('time','type_dim','alt_bin','Dm_bin',),
+                                            fill_value=missing_int,zlib=True,complevel=5)
+            core_var_id.units = 'none'
+            core_var_id.long_name = 'Dm counts for core regions only'
+        else:
+            core_var_id = id.createVariable('Dm_cfad_core','i4',('time','alt_bin','Dm_bin',),
+                                            fill_value=missing_int,zlib=True,complevel=5)
+            core_var_id.units = 'none'
+            core_var_id.long_name = 'Dm counts for core regions only'
+                    
+        if verbose:
+            print('Done with vars')
+            
+        # define global variables
+        id.Title = title
+        id.source = source
+        if ifeature == 'Conv':
+            id.echo_type = etype
+
+        if verbose:
+            print('Done with global attr')
+
+        # write data to file
+        time_var_id[:] = np.asarray(secs_since_1970)
+        alt_var_id[:]  = alt
+        dm_var_id[:] = Dm
+        if ifeature == 'Conv':
+            #type_var_id[:] = np.asarray([0,1,2])
+            type_var_id[:] = types_out
+        full_var_id[:] = np.reshape(cfad_full,(1,numAlts,numDms))
+        if ifeature == 'Conv':
+            core_var_id[:] = np.reshape(cfad_core,(1,len(convCoreTypes),numAlts,numDms))
+        else:
+            core_var_id[:] = np.reshape(cfad_core,(1,numAlts,numDms))
+
+        if verbose:
+            print('Done writing data')
+
+        # close netcdf file
+        id.close()
+               
+
+                
+                

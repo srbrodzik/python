@@ -1,0 +1,28 @@
+Try some version of this for 2D plots of data on maps, etc.  Copied this from another script so need to modify
+  bmap.imshow command.
+
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import numpy as np
+  
+ext = [-88.2324303714557772, -9.1448395559093854, -51.5812070039604080, 18.3435779697121433]
+orig_lat = 10.
+orig_lon = -60.
+  
+plt.figure(figsize=(12, 8))
+bmap = Basemap(llcrnrlon=ext[0], llcrnrlat=ext[1], urcrnrlon=ext[2], urcrnrlat=ext[3],
+	       lat_0=orig_lat,lon_0=orig_lon, epsg=4326, resolution='i')
+bmap.arcgisimage(service='World_Street_Map', xpixels=500, verbose=True)
+bmap.drawcoastlines()
+bmap.drawcountries()
+bmap.drawstates()
+bmap.drawparallels(np.arange(35,50,5),labels=[1,0,0,0])
+bmap.drawmeridians(np.arange(-90,-65,5),labels=[0,0,0,1])
+#bmap.etopo(e=0.5,alpha=0.5)
+#bmap.shadedrelief()
+  
+bmap.imshow(grid.fields['reflectivity']['data'][0], origin='lower',extent=(ext_izq, ext_der, ext_abajo, ext_arriba),
+	    vmin=0, vmax=70, cmap='pyart_NWSRef')
+
+plt.savefig('/tmp/pyfig', bbox_inches='tight')
+

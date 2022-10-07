@@ -1,0 +1,132 @@
+Change Log
+----------
+v1.7.1 major changes (08/07/2019):
+1. Added CAMP2EX to the available project list.
+2. Fixed visual bugs in plot_ampr_channels method to account for recent
+   matplotlib updates. Please update to matplotlib 3.0+ if possible.
+3. Fixed map resolution bug in plot_ampr_track_4panel. Note that this
+   method runs slowly when plotting low-altitude AMPR data on high-
+   resolution background maps. 
+
+v1.7 major changes (07/22/2019):
+1. Removed Basemap as a dependency.
+2. Added Cartopy as a dependency. All maps (e.g., AmprTb.plot_ampr_track) are now created
+   using Cartopy.
+3. Miscellaneous small updates and bug fixes.
+
+v1.6 major changes (06/30/2017):
+1. Enabled ingest of new CF-compliant formatted netCDF data from various dual-pol
+   and pre-dual-pol campaigns.
+2. Miscellaneous bug fixes, refactoring, and documentation.
+
+v1.5.3 major changes (03/03/2017):
+1. Updated track plotting routines to recreate a Basemap object for each plot.
+   This is slower but necessary as matplotlib 1.5+ no longer allows passing old
+   Basemaps to new subplots.
+2. Support for ingesting devolved H & V brightness temperatures if present in
+   the netCDF Level 2 file.
+3. Miscellaneous bug fixes and refactoring.
+
+v1.5.2 major changes (11/26/2015):
+1. Added AmprTb.plot_ampr_track_4panel() method. This method uses the new
+   _FourPanelTrack class in pyampr’s misc_tools to quickly produce a nice-looking
+  four-panel geolocated figure for the A, B, H, or V channels (the latter two
+  require running AmprTb.calc_polarization first).
+2. Moved the PyAMPR default global variables to a separate file.
+3. Default Basemap for the track plots now has the land colored light brown,
+   the water light blue, and the latitude labels rotated 90 degrees. Since the
+   Basemap can be returned, these can all be modified by the end user.
+4. Demo notebook updates.
+
+v1.5.1 major changes (11/19/2015):
+1. Offered more Basemap options in AmprTb.plot_ampr_track(), including area_thresh
+   and projection keywords.
+2. Added ability to incorporate other axes/figure objects into AmprTb.plot_ampr_track()
+   calls, which enables multi-panel plots. 
+3. Added independent function called read_aircraft_nav_into_awot to facilitate using
+   AWOT (https://github.com/nguy/AWOT) to help display flight tracks. This does not
+   add AWOT as a dependency (even an optional one).
+
+v1.5 major changes (07/08/2015):
+1. Made PyAMPR and its notebooks work under Python 3.4. Python 2.7 still supported, but
+   users may have to install transition modules like six, etc.
+2. Add capability to display QC flags, which are available in IPHEx and later datasets.
+   Use the show_qc Boolean keyword in the display routines (e.g., plot_ampr_track).
+3. Added ability to change resolution of Basemap in plot_ampr_track, via the resolution
+   keyword.
+
+v1.4.2 major changes (07/06/2015):
+1. Updated netCDF read routines to account for IPHEx 37 GHz channel swap being fixed.
+2. Made all code pep8 compliant.
+
+v1.4.1 major changes (06/26/2015):
+1. Updated netCDF read routines to be able to handle lab data with no geolocations.
+2. Refactoring to better compartmentalize netCDF read routines.
+
+v1.4 major changes (03/22/2015):
+1. Added support for Level 2B netCDF files. Starting with IPHEX,
+   processed AMPR instrument files will be provided in a netCDF-4 format. 
+2. Renamed read_ampr_tb_leve1b to read_ampr_tb_level2b. Technically, the published
+   AMPR data are Level 2B, and Level 1B data consist of pre-QC’d lower-level data. 
+3. Swapped to standard AMPR convention for AmprTb.swath_angle and AmprTb.swath_left.
+   Now go from -44.1 to 44.1 deg from left to right. Note AMPR scans right to left 
+   but by convention reports its data left to right.
+
+v1.3.2 major changes (09/24/2014):
+1. Deleted write_ampr_kml method from AmprTb and all associated helper functions in 
+   google_earth_tools.
+2. Removed private but dead code.
+
+v1.3.1 major changes:
+1. Global constant variable renaming to conform better with PEP8 standards.
+2. Converted to installable module (complete with setup.py script).
+3. Added support for reading gzipped AMPR TB files without first decompressing
+
+v1.3 major changes:
+1. Significant refactoring of major methods to make use of new internal 
+   methods. This reduced code duplication and makes the major methods
+   more readable. It also reduced the number of local variables in the
+   major methods.
+2. Significant variable renaming to improve clarity. Most notably,
+   Ampr_Tb class is now AmprTb to conform to PEP8 standard.
+3. Put hard coding of constants at top of program to make it obvious.
+4. Added the ability to suppress plotting of swaths during aircraft maneuvers
+   in plot_ampr_track() and write_ampr_kmz()
+5. Added timerange keyword to main plotting methods to allow filtering by
+   time instead of scan number.
+6. Added flag to enable returning of figure, Basemap, etc. objects from
+   plot_ampr_track(). This empowers the creation of highly customized plots
+   while still using plot_ampr_track() as a baseline for the AMPR component.
+7. Added timespan stamp to write_ampr_kmz() and google_earth_tools.py. Now 
+   multiple KMZ files from different times can be viewed in sequence in 
+   Google Earth.
+
+v1.2 major changes:
+1. Further adjustments to the plotting routines to handle grossly 
+   bad geolocations. Now, the presence of bad_data, 0s, -1s, or wildly
+   varying Latitude/Longitude values within an individual scan gets the scan
+   not considered for plotting purposes. There is a flag, equator, that can
+   be set to True if the aircraft is flying near the Equator or Prime Meridian
+   and 0s and -1s are normally expected.
+2. Added internal methods _get_scan_indices() and _filter_bad_geolocations()
+   to handle repeated tasks in the plotting routines.
+3. Changed calc_polarization() to no longer consider aircraft roll angle.
+   Now much quicker due to matrix multiplication. Flags are available 
+   to switch between simple substitution or constrained linear inversion, 
+   and to switch between forcing nadir matching in channels A & B or not.
+   Can also now just call deconvolution for individual freqs if desired.
+4. Changed default colormap to Brent Robert's amprTB_cmap, available in
+   udf_cmap.py. If not available will just use cm.GMT_wysiwyg, available 
+   from Basemap (a required dependency).
+5. Adjusted the read routine to set infinites/NaNs in Level 1B TBs and 
+   Latitude/Longitude to bad_data. Was blowing up Python during the
+   plotting routines otherwise.
+
+v1.1 major changes:
+1. Added support for all projects on the GHRC, plus IPHEX.
+2. Adjustments to the plotting routines to handle grossly bad geolocations
+3. Adjusted plot_ampr_track() to put the colorbar on its own separate axis,
+   so it is not varying in size with the plot.
+4. Strip charts from plot_ampr_channels() now can show deconvolved H & V 
+   via a keyword argument.
+5. ER2 now called Aircraft to keep things generalized.

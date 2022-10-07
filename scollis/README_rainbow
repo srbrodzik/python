@@ -1,0 +1,9 @@
+To read old gematronik rainbow format (v3.4)
+http://radar.irimo.ir/images/file/rainbow%20file%20format.pdf
+If you have access to a current Rainbow Software Suite, I think you can 
+convert the old format to Rainbow5. But this needs to be confirmed, yet.
+ 
+To read new gemtronic rainbow format (v5)
+http://arm-doe.github.io/pyart-docs-travis/dev_reference/aux_io.html#pyart-aux-io-rainbow
+
+

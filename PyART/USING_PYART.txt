@@ -1,0 +1,61 @@
+import matplotlib.pyplot as plt
+import pyart
+
+radar = pyart.io.read('filename') - read in radar file
+
+type(radar)
+help(radar) - lots of info
+radar.info('compact') - also uses 'standard' and 'full' options
+type(radar.elevation) - returns 'dict'
+
+radar.elevation.keys() - returns attribute names
+  get values of attributes using: print radar.elevation['units']
+  get value of data using: radar.elevation['data']
+  
+Get number of sweeps in file with: radar.nsweeps
+
+radar.fields.keys() - returns names of all radar variables (dbz, rhohv, etc)
+type(radar.fields['DBZ']) - returns 'dict'
+
+display = pyart.graph.RadarDisplay(radar) - creates radar display object
+
+plt.savefig('filename') - saves current plot to a file
+
+To plot radar data directly, use:
+!radar_plot --tilt=1 --vmin=-32 --vmax=20 [filename] [field]
+where vmin/vmax are min/max values of colorbar
+
+write_cfradial(filename,radar
+
+plt.savefig('/home/disk/bob/olympex/cfradial/moments/npol_qc/rhi/20151117.test/cfrad.20151117_200608.000_to_20151117_201207.000_NPOL1_v1_RHI.nc')
+
+
+Read rainbow
+------------
+import wradlib as wrl
+import pyart
+filename = wrl.util.get_wradlib_data_file('rainbow/2013070308340000dBuZ.azi')
+rbdict = wrl.io.read_Rainbow(filename)
+
+Read rainbow and output cfradial
+--------------------------------
+import pyart
+inFile = '/home/disk/bob/olympex/xband/rainbowFiles/RAW_DOPVOL1_A/DBZ/2015113023500600dBZ.azi'
+radar = pyart.aux_io.read_rainbow_wrl(inFile)
+angle = radar.fixed_angle['data'][0]
+mode = radar.scan_type
+timeStr = radar.time['units'][14:]
+year = timeStr[0:4]
+month = timeStr[5:7]
+day = timeStr[8:10]
+hour = timeStr[11:13]
+min = timeStr[14:16]
+sec = timeStr[17:19]
+date = year+month+day
+time = hour+min+sec
+outFile = 'cfrad.'+date+'_'+time+'_xband_'+str(angle)+'_'+mode.upper()+'.nc'
+pyart.io.write_cfradial(outFile,radar)
+
+
+
+/root/.pip/pip.log

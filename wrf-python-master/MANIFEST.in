@@ -1,0 +1,13 @@
+include README.md
+include LICENSE
+include requirements.txt
+
+include fortran/*.f90
+include fortran/*.pyf
+include setup.py
+
+recursive-include doc/source *
+recursive-exclude doc/build *
+include doc/make.bat
+include doc/Makefile
+

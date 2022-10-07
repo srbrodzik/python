@@ -1,0 +1,23 @@
+Lots of folks have been asking about condo environments..
+Since I got a new Mac last week I am doing a fresh install of, well,
+everything. Once challenge I have set is to make sure every environment I
+use can be dropped in with a YAML file..
+ 
+So I have started a repo with my environments.. It is here:
+https://github.com/EVS-ATMOS/environments
+Its bare right now but I do have this file:
+https://github.com/EVS-ATMOS/environments/blob/master/radar/pyart_full.yml
+ 
+So.. with a nice anaconda3 install you should be able to do a:
+export COIN_INSTALL_DIR=/Users/USERNAME/CONDA_DIR/envs/pyart-full
+Eg:
+export COIN_INSTALL_DIR=/Users/scollis/anaconda3/envs/pyart-full
+ 
+Then conda env create -f pyart-full
+ 
+This will give you Py-ART with all the bells and whistles including cylp
+ 
+Give it a go and let me know if you encounter any issues!
+ 
+ 
+Scott Collis

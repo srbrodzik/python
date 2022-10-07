@@ -1,0 +1,75 @@
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import numpy as np
+  
+ext = [-88.0, 36.2, -66.5, 48]
+orig_lat = 42.
+orig_lon = -77.
+
+plt.figure(figsize=(12, 8))
+bmap = Basemap(llcrnrlon=ext[0], llcrnrlat=ext[1],
+               urcrnrlon=ext[2], urcrnrlat=ext[3],
+	       lat_0=orig_lat,lon_0=orig_lon, epsg=4326, resolution='i')
+#bmap.arcgisimage(service='World_Street_Map', xpixels=500, verbose=True)
+bmap.drawcoastlines()
+bmap.drawcountries()
+bmap.drawstates()
+bmap.drawparallels(np.arange(35,50,5),labels=[1,0,0,0])
+bmap.drawmeridians(np.arange(-90,-65,5),labels=[0,0,0,1])
+#bmap.etopo(e=0.5,alpha=0.5)
+bmap.shadedrelief()
+
+# add ASOS sites
+#KALB (Albany, NY)
+x, y = bmap(-73.802,42.748)
+#plt.plot(x,y,'ok',markersize=5)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KACY (Atlantic City, NJ)
+x, y = bmap(-74.577,39.458)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KBOS (Boston, MA)
+x, y = bmap(-71.007,42.363)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KHWV (Brookhaven, NY)
+x, y = bmap(-72.867,40.822)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KBWI (BWI Airport, MD)
+x, y = bmap(-76.668,39.175)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KCON (Concord, NH)
+x, y = bmap(-71.502,43.203)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KGED (Georgetown, DE)
+x, y = bmap(-75.359,38.689)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KHFD (Hartford, CT)
+x, y = bmap(-72.65,41.737)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KISP (Islip, NY)
+x, y = bmap(-73.1,40.795)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KORF (Norfolk, VA)
+x, y = bmap(-76.201,36.895)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KPHL (Philadelphia, PA)
+x, y = bmap(-75.241,39.872)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KPWM (Portland, ME)
+x, y = bmap(-70.309,43.646)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KDCA (Reagan Airport, VA)
+x, y = bmap(-77.038,38.852)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KRIC (Richmond, VA)
+x, y = bmap(-77.32,37.505)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KAVP (Scranton, PA)
+x, y = bmap(-75.723,41.339)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+#KWAL (Wallops, VA)
+x, y = bmap(-75.466,37.94)
+plt.plot(x,y,color="red",marker="D",markersize=4,linestyle="None")
+
+#plt.legend()
+
+plt.savefig('/tmp/impacts_domain', bbox_inches='tight')

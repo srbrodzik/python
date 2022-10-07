@@ -1,0 +1,9 @@
+Here are the programs I am using to dealias the radial velocity data. (Cleaned
+up from my test program.)  It will give you a start.  Today I had trouble
+getting the code to find the RSL libraries.  (Frustrating since it worked 6
+months ago.0  This is what worked for me:
+
+conda install -c jjhelmus trmm_rsl=1.49   # NOT the conda-forge version
+conda install -c conda-forge arm_pyart=1.7.0
+* You can check if pyart is finding rsl with
+python -c "import pyart; pyart._debug_info()"

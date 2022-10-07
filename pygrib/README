@@ -1,0 +1,19 @@
+I need to convert some grib2 data files to netcdf.  I found this python
+package called pygrib which is supposed to make that easy but found that
+before installing pygrib, I need to make something called eccodes.
+
+https://gist.github.com/emmanuelnk/406eee50c388f4f73dcdff521f2aa7b2
+
+Do we have this built somewhere on our system?
+
+Or do you know of a better way to do this conversion?
+
+ANSWER FROM DAVE OVENS:
+
+I have eccodes installed on sage in
+
+/home/disk/sage1/mm5rt/GRIB
+
+and other software called wgrib2 which does the conversion this easily:
+
+~ovens/bin/wgrib2 gribfile -netcdf gribfile.nc

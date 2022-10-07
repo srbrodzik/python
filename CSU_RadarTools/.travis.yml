@@ -1,0 +1,24 @@
+sudo: false
+env:
+  matrix:
+  - USE_CYTHON=true
+  - USE_CYTHON=false
+  global:
+  - LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libgfortran.so.3
+
+python:
+    - "2.7"
+    - "3.5"
+    - "3.6"
+    - "3.7"
+
+addons:
+  apt:
+    packages:
+    - gfortran
+
+language: python
+
+install: source continuous_integration/install.sh
+# script: eval xvfb-run pytest .
+script: python -m pytest tests/

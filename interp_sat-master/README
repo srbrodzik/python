@@ -1,0 +1,6 @@
+To install in user's default python path (~/.local/lib/python2.7/site-packages)
+run this command:
+
+python setup.py install --user
+
+

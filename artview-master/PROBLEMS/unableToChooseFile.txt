@@ -1,0 +1,18 @@
+shear:brodzik:238>artview
+
+## You are using the Python ARM Radar Toolkit (Py-ART), an open source
+## library for working with weather radar data.
+##
+## If you use this software to prepare a publication, please cite:
+##
+##     JJ Helmus and SM Collis, JORS 2016, doi: 10.5334/jors.119 
+Object::connect: No such signal org::freedesktop::UPower::DeviceAdded(QString)
+Object::connect: No such signal org::freedesktop::UPower::DeviceRemoved(QString)
+Traceback (most recent call last):
+  File "/home/disk/shear2/brodzik/.local/lib/python2.7/site-packages/artview/components/plot_radar.py", line 562, in NewTilt
+    self.tiltBox.setCurrentIndex(self.Vtilt.value+1)
+TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
+disconnect var Vtilt of Display2 from Display1
+disconnect var Vradar of Display2 from Display1
+Opening file /home/disk/bob/olympex/cfradial/moments/npol_qc/sur/20151117/cfrad.20151117_015658.000_to_20151117_015816.000_NPOL1_v1_PPI.nc
+Changed Scan types, reinitializing

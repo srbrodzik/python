@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: pysolo
+Version: 0.4
+Summary: Display CfRadial format radar/lidar file
+Home-page: whatever
+Author: Xin Pan and Joe VanAndel
+Author-email: vanandel@ucar.edu
+License: UNKNOWN
+Description: Really long text here.
+Platform: UNKNOWN

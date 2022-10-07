@@ -1,0 +1,6 @@
+artview.plugins.Mapper.NewRadar
+===============================
+
+.. currentmodule:: artview.plugins
+
+.. automethod:: Mapper.NewRadar

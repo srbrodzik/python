@@ -1,0 +1,45 @@
+artview.components.SelectRegion
+===============================
+
+.. currentmodule:: artview.components
+
+.. autoclass:: SelectRegion
+   :show-inheritance:
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+         SelectRegion.CreateSelectRegionWidget
+         SelectRegion.NewPlotAxes
+         SelectRegion.button_press_callback
+         SelectRegion.closeEvent
+         SelectRegion.connect
+         SelectRegion.disconnect
+         SelectRegion.guiStart
+         SelectRegion.motion_notify_callback
+         SelectRegion.removePolygon
+         SelectRegion.removeVertex
+         SelectRegion.resetSelectRegion
+         SelectRegion.update_points
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+   
+   
+   .. autoattribute:: Vfield
+   .. autoattribute:: Vgatefilter
+   .. autoattribute:: VpathInteriorFunc
+   .. autoattribute:: VplotAxes
+   .. autoattribute:: Vpoints
+   .. autoattribute:: Vradar
+   
+   
+

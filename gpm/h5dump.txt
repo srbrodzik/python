@@ -1,0 +1,24 @@
+file: 3B-HHR.MS.MRG.3IMERG.20140409-S190000-E192959.1140.V03D.HDF5
+
+/Grid GridHeader attribute:
+BinMethod=ARITHMETIC_MEAN;
+Registration=CENTER;
+LatitudeResolution=0.1;
+LongitudeResolution=0.1;
+NorthBoundingCoordinate=90;
+SouthBoundingCoordinate=-90;
+EastBoundingCoordinate=180;
+WestBoundingCoordinate=-180;
+Origin=SOUTHWEST;
+
+/Grid/IRkalmanFilterWeight  int16(3600, 1800)
+/Grid/HQprecipSource  int16(3600, 1800)
+/Grid/lon  float32(3600,)
+/Grid/precipitationCal  float32(3600, 1800)
+/Grid/precipitationUncal  float32(3600, 1800)
+/Grid/lat  float32(1800,)
+/Grid/HQprecipitation  float32(3600, 1800)
+/Grid/probabilityLiquidPrecipitation  int16(3600, 1800)
+/Grid/HQobservationTime  int16(3600, 1800)
+/Grid/randomError  float32(3600, 1800)
+/Grid/IRprecipitation  float32(3600, 1800)

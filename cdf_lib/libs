@@ -1,0 +1,16 @@
+/usr/local/lrose/lib:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/compiler/lib/intel64_lin:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/libfabric/lib:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/lib/release:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/mpi/intel64/lib:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/ipp/lib/x86_64:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/mkl/lib/intel64_lin:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/tbb/lib/intel64/gcc4.8:
+/opt/intel/debugger_2020/python/intel64/lib:
+/opt/intel/debugger_2020/libipt/intel64/lib:
+/opt/intel/compilers_and_libraries_2020.4.304/linux/daal/lib/intel64_lin:
+/opt/intel/Compiler/11.1/064/mkl/lib/em64t:
+/opt/intel/Compiler/11.1/064/ipp/em64t/sharedlib:
+/opt/intel/Compiler/11.1/064/lib/intel64:
+/opt/intel/Compiler/11.1/064/tbb/intel64/cc4.1.0_libc2.4_kernel2.6.16.21/lib:
+/usr/local/lib

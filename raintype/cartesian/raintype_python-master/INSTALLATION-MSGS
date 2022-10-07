@@ -1,0 +1,55 @@
+shear:brodzik:129>python setup.py install --user
+running install
+running bdist_egg
+running egg_info
+creating uw_raintype.egg-info
+writing uw_raintype.egg-info/PKG-INFO
+writing top-level names to uw_raintype.egg-info/top_level.txt
+writing dependency_links to uw_raintype.egg-info/dependency_links.txt
+writing manifest file 'uw_raintype.egg-info/SOURCES.txt'
+reading manifest file 'uw_raintype.egg-info/SOURCES.txt'
+writing manifest file 'uw_raintype.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build
+creating build/lib.linux-x86_64-2.7
+creating build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/__init__.py -> build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/algorithm.py -> build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/netcdf_io.py -> build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/raintype.py -> build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/rtfunctions.py -> build/lib.linux-x86_64-2.7/uw_raintype
+copying uw_raintype/runraintype.py -> build/lib.linux-x86_64-2.7/uw_raintype
+creating build/bdist.linux-x86_64
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/__init__.py -> build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/algorithm.py -> build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/netcdf_io.py -> build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/raintype.py -> build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/rtfunctions.py -> build/bdist.linux-x86_64/egg/uw_raintype
+copying build/lib.linux-x86_64-2.7/uw_raintype/runraintype.py -> build/bdist.linux-x86_64/egg/uw_raintype
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/__init__.py to __init__.pyc
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/algorithm.py to algorithm.pyc
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/netcdf_io.py to netcdf_io.pyc
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/raintype.py to raintype.pyc
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/rtfunctions.py to rtfunctions.pyc
+byte-compiling build/bdist.linux-x86_64/egg/uw_raintype/runraintype.py to runraintype.pyc
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+copying uw_raintype.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying uw_raintype.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying uw_raintype.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying uw_raintype.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+zip_safe flag not set; analyzing archive contents...
+creating dist
+creating 'dist/uw_raintype-1.0-py2.7.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing uw_raintype-1.0-py2.7.egg
+Copying uw_raintype-1.0-py2.7.egg to /home/disk/meso-home/brodzik/.local/lib/python2.7/site-packages
+Adding uw-raintype 1.0 to easy-install.pth file
+
+Installed /home/disk/meso-home/brodzik/.local/lib/python2.7/site-packages/uw_raintype-1.0-py2.7.egg
+Processing dependencies for uw-raintype==1.0
+Finished processing dependencies for uw-raintype==1.0
+shear:brodzik:130>ls -l

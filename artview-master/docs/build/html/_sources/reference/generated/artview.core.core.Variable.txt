@@ -1,0 +1,30 @@
+artview.core.core.Variable
+==========================
+
+.. currentmodule:: artview.core.core
+
+.. autoclass:: Variable
+   :show-inheritance:
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+         Variable.change
+         Variable.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+   
+   
+   .. autoattribute:: value
+   
+   
+

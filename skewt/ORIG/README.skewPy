@@ -1,0 +1,18 @@
+See
+
+https://pypi.python.org/pypi/SkewT
+
+for installation details.
+
+
+To run Brody's code use these commands:
+
+python skewplot.py last  - only latest
+
+python skewplot.py - all
+
+---------------------------------------------------
+To list all declared python variables:
+import pprint
+pprint.pprint(locals())
+

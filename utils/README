@@ -1,0 +1,6 @@
+Use this instead - outputs distance in meters
+
+import gpxpy.geo
+dist = gpxpy.geo.haversine_distance(lat1, lon1, lat2, lon2)
+print(dist)
+

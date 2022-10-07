@@ -1,0 +1,138 @@
+def writeBasicNetcdf(ncname,rt_min,rt_best,rt_max,rr_min,rr_best,rr_max,
+                     method_min,method_best,method_max,
+                     deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                     weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                     a_conv,b_conv,a_stra,b_stra,
+                     title,institution,source_uw,source_csu,references,comment,
+                     dx,radar_lat,radar_lon,xdim,ydim,types,missing_value):
+
+OK
+def writeBasicNetcdfV6(ncname,rt,rr_min,rr_best,rr_max,
+                       method_min,method_best,method_max,
+                       deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                       weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                       a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                       a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                       title,institution,source_uw,source_csu,references,comment,
+                       dx,radar_lat,radar_lon,xdim,ydim,types,missing_value):
+io.writeBasicNetcdfV6(outFile,rt_powell,rr_min,rr_best,rr_max,
+                      method_min,method_best,method_max,
+                      deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                      weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                      a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                      a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                      title,institution,source_uw,source_csu,references,comment,
+                      dx,radar_lat,radar_lon,raintype.shape[0],rtout.shape[1],types,missing_value_refl)
+
+def writeCFnetcdf(ncname,rt_min,rt_best,rt_max,rr_min,rr_best,rr_max,
+                  method_min,method_best,method_max,
+                  deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                  weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                  a_conv,b_conv,a_stra,b_stra,
+                  title,institution,source_uw,source_csu,references,comment,
+                  timeVal,xVal,yVal,latVal,lonVal,gmVal,
+                  lat_origin,lon_origin,types,missing_value):
+
+OK
+def writeCFnetcdfV6(ncname,rt,rr_min,rr_best,rr_max,
+                    method_min,method_best,method_max,zr_method,
+                    deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                    weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                    a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                    a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                    title,institution,source_uw,source_csu,references,comment,
+                    timeVal,xVal,yVal,latVal,lonVal,gmVal,
+                    lat_origin,lon_origin,types,missing_value):
+io.writeCFnetcdfV6(outFile,rt_powell,rr_min,rr_best,rr_max,
+                   method_min,method_best,method_max,zr_method,
+                   deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                   weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                   a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                   a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                   title,institution,source_uw,source_csu,references,comment,
+                   tim,x,y,lat,lon,gm,lat_origin,lon_origin,types,missing_value_refl)
+
+def writeZebNetcdf(ncname,rt_min,rt_best,rt_max,rr_min,rr_best,rr_max,
+                   method_min,method_best,method_max,
+                   deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                   weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                   a_conv,b_conv,a_stra,b_stra,
+                   title,institution,source_uw,source_csu,references,comment,
+                   btVal,toVal,latVal,lonVal,altVal,xspVal,yspVal,zspVal,types,missing_value):
+
+NEEDS MODS
+def writeZebNetcdfV6(ncname,rt,rr_min,rr_best,rr_max,
+                   method_min,method_best,method_max,
+                   deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                   weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                   a_conv,b_conv,a_stra,b_stra,
+                   title,institution,source_uw,source_csu,references,comment,
+                   btVal,toVal,latVal,lonVal,altVal,xspVal,yspVal,zspVal,types,missing_value):
+io.writeZebNetcdfV6(outFile,rt_powell,rr_min,rr_best,rr_max,
+                    method_min,method_best,method_max,
+                    deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                    weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                    a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                    a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                    title,institution,source_uw,source_csu,references,comment,
+                    bt,toff,lat,lon,alt,dx,dy,dz,types,missing_value_refl)
+
+
+def writeBasicNetcdfBestOnlyV6(ncname,rt,rr_best,method_best,
+                               deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                               weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                               a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                               a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                               title,institution,source_uw,source_csu,references,comment,
+                               dx,radar_lat,radar_lon,xdim,ydim,types,missing_value):
+
+def writeCFnetcdfBestOnly(ncname,rt_best,rr_best,method_best,
+                          deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                          weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                          a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                          a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                          title,institution,source_uw,source_csu,references,comment,
+                          timeVal,xVal,yVal,latVal,lonVal,gmVal,
+                          lat_origin,lon_origin,types,missing_value):
+
+OK
+def writeCFnetcdfBestOnlyV6(ncname,rt_best,rr_best,method_best,
+                            deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                            weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                            a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                            a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                            title,institution,source_uw,source_csu,references,comment,
+                            timeVal,xVal,yVal,latVal,lonVal,gmVal,
+                            lat_origin,lon_origin,types,missing_value):
+io.writeCFnetcdfBestOnlyV6(outFile,rt_powell,rr_best,method_best,
+                           deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                           weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                           a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                           a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                           title,institution,source_uw,source_csu,references,comment,
+                           tim,x,y,lat,lon,gm,lat_origin,lon_origin,types,missing_value_refl)
+
+def writeZebNetcdfBestOnly(ncname,rt_best,rr_best,method_best,
+                           deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                           weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                           a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                           a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                           title,institution,source_uw,source_csu,references,comment,
+                           btVal,toVal,latVal,lonVal,altVal,xspVal,yspVal,zspVal,types,missing_value):
+
+OK
+def writeZebNetcdfBestOnlyV6(ncname,rt_best,rr_best,method_best,
+                             deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                             weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                             a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                             a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                             title,institution,source_uw,source_csu,references,comment,
+                             btVal,toVal,latVal,lonVal,altVal,xspVal,yspVal,zspVal,types,missing_value):
+io.writeZebnetcdfBestOnlyV6(outFile,rt_powell,rr_best,method_best,
+                            deepcoszero,shallowconvmin,minZdiff,truncZconvthres,dBZformaxconvradius,
+                            weakechothres,backgrndradius,maxConvRadius,minsize,startslope,maxsize,
+                            a_conv,b_conv,a_stra,b_stra,a_all,b_all,a_kdp_zdr,b_KDP_zdr,b_kdp_ZDR,
+                            a_zh_zdr,b_ZH_zdr,b_zh_ZDR,a_kdp,b_kdp,
+                            title,institution,source_uw,source_csu,references,comment,
+                            bt,toff,lat,lon,alt,dx,dy,dz,types,missing_value_refl)
+

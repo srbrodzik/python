@@ -1,0 +1,7 @@
+README.rst
+setup.py
+linfit.egg-info/PKG-INFO
+linfit.egg-info/SOURCES.txt
+linfit.egg-info/dependency_links.txt
+linfit.egg-info/requires.txt
+linfit.egg-info/top_level.txt

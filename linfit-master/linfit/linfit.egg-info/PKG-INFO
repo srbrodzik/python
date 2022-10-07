@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: linfit
+Version: 2014.9.3
+Summary: Least squares linear fit for numpy library of Python
+Home-page: https://github.com/djpine/linfit
+Author: David Pine
+Author-email: UNKNOWN
+License: LGPL2
+Download-URL: https://github.com/djpine/linfit
+Description: UNKNOWN
+Platform: UNKNOWN

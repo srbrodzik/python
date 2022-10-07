@@ -1,0 +1,32 @@
+artview.plugins.PhaseProcLp
+===========================
+
+.. currentmodule:: artview.plugins
+
+.. autoclass:: PhaseProcLp
+   :show-inheritance:
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+      :toctree:
+   
+         PhaseProcLp.addGeneralOptions
+         PhaseProcLp.chooseRadar
+         PhaseProcLp.guiStart
+         PhaseProcLp.phase_proc_lp
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+   
+   
+   .. autoattribute:: Vradar
+   
+   
+

@@ -1,0 +1,10 @@
+The main folder for this stuff is ../funnel/olympex/archive2/wxdata/Code
+
+plot_mesowest_3day.py is the one that makes the above plot.
+
+For data acquisition I would do things completely different now, back then I was scraping from the web but you can acquire all of the surface data more easily now through the synoptic labs API. https://synopticlabs.org/synoptic/ I have some starter python code to do this: https://github.com/joejoezz/blog/blob/master/2018/mesonet_api_simple_example.py
+Although they have recently gone to a subscription service and you may need to pay $ depending on how many API calls you do. But it might be worth it because it is incredibly easy to get the data that way, just a few lines of code. 
+
+Let me know if you have more questions,
+
+Joe

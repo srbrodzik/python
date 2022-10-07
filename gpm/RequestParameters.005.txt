@@ -1,0 +1,38 @@
+Coincidence Type : None or Satellite-Ground Validation Site
+Data File Format : HDF
+Data Type : 2AKu
+Date Range : 20161101-00:00:00.000,20161101-23:59:00.000
+Create copy of PPS products in the archive : No
+Create links to PPS products in the archive : No
+Stand Alone Request : Yes
+Perform Parameter Subset : Yes
+Product Suffix (subsetId) : UW
+Product Type : Product
+Push a DN to remote system : No
+Indication if order will handle reprocessed data : No
+Product Parameter : 2AKu:NS:CSF:flagShallowRain
+Product Parameter : 2AKu:NS:CSF:heightBB
+Product Parameter : 2AKu:NS:CSF:typePrecip
+Product Parameter : 2AKu:NS:CSF:widthBB
+Product Parameter : 2AKu:NS:FLG:flagEcho
+Product Parameter : 2AKu:NS:Latitude
+Product Parameter : 2AKu:NS:Longitude
+Product Parameter : 2AKu:NS:ScanTime:DayOfMonth
+Product Parameter : 2AKu:NS:ScanTime:DayOfYear
+Product Parameter : 2AKu:NS:ScanTime:Hour
+Product Parameter : 2AKu:NS:ScanTime:MilliSecond
+Product Parameter : 2AKu:NS:ScanTime:Minute
+Product Parameter : 2AKu:NS:ScanTime:Month
+Product Parameter : 2AKu:NS:ScanTime:Second
+Product Parameter : 2AKu:NS:ScanTime:SecondOfDay
+Product Parameter : 2AKu:NS:ScanTime:Year
+Product Parameter : 2AKu:NS:SLV:phaseNearSurface
+Product Parameter : 2AKu:NS:SLV:precipRateNearSurface
+Product Parameter : 2AKu:NS:SLV:zFactorCorrected
+Indicates what scripts to build : Python
+Indicates if user has ssh/sftp access : No
+The tar file containing the TK code : requestedCode_005_2AKuUW_hdf5.tar
+Temporal Type: Date Range or Orbit Range : Date Range
+Request TKIO Read/Write Code : Yes
+TKIO Code Language : C
+Request ID : 005

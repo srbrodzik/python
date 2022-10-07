@@ -1,0 +1,36 @@
+Question about NIDS data from NOAAPORT
+
+Since no one answered you, I suppose I will, even though it's been awhile :)
+ 
+PyArt reads NOAAPort data just fine... I'm migrating from gempak, so I 
+store my files in a "gempak" way, but an easy way in python to fetch the 
+latest file is to glob it.. such as
+ 
+import sys
+import glob
+import os
+import pyart
+ 
+# Use GLOB to determine the newest file in the directory by creation time
+filename = min(glob.iglob('/home/disk/ldm/data/gempak/nexrad/NIDS/IWX/DHR/DHR_*'
+), key=os.path.getctime)
+print (filename)
+radar = pyart.io.read_nexrad_level3(filename)
+display = pyart.graph.RadarDisplay(radar)
+ 
+ 
+Then just use your normal routines to display, or us (agg) if you want to 
+save the file as a png.
+ 
+plt.show()
+plt.savefig('/home/ldm/util/python/nexrad/'+(pngName), bbox_inches='tight', 
+pad_inches=0.25)
+
+-----------------------------------------------------------------------------
+
+SRB NOTE
+  I tried this for this dir
+  /home/disk/data/gempak/nexrad/NIDS/IWX/NTP
+  and it found the oldest file, not the newest file.  Not sure why . . .
+
+  
