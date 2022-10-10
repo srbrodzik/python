@@ -45,7 +45,6 @@ wind_dir = df['direction'].values * units.degrees
 u, v = mpcalc.wind_components(wind_speed, wind_dir)
 
 ###########################################
-
 # Create a new figure. The dimensions here give a good aspect ratio
 fig = plt.figure(figsize=(9, 9))
 #add_metpy_logo(fig, 630, 80, size='large')

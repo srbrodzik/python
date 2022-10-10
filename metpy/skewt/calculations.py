@@ -5,6 +5,7 @@ from numpy import exp
 import math
 
 Epsilon=0.622         # Epsilon=R_s_da/R_s_v; The ratio of the gas constants
+verbose = False
 
 def calcs(df):
 
@@ -13,13 +14,16 @@ def calcs(df):
         h20 = df['height'][np.argmin(abs(df['temperature']+20))]
         h30 = df['height'][np.argmin(abs(df['temperature']+30))]
         h40 = df['height'][np.argmin(abs(df['temperature']+40))]
-        print('h0 =',h0,'h10 =',h10,'h20 =',h20,'h30 =',h30,'h40 =',h40)
+        if verbose:
+                print('h0 =',h0,'h10 =',h10,'h20 =',h20,'h30 =',h30,'h40 =',h40)
 
         lcl_height = 216*(df['temperature'][0]-df['dewpoint'][0])
-        print('lcl_height =',lcl_height)
+        if verbose:
+                print('lcl_height =',lcl_height)
         
         wcd = h0 - lcl_height
-        print('wcd =',wcd)
+        if verbose:
+                print('wcd =',wcd)
         
         # SRB: removed this formula for mixing ratio and reverted to orig definition
         #mr = MixRatio(SatVap(df['dewpoint'][0]), df['pressure']*100)
@@ -27,7 +31,8 @@ def calcs(df):
         pdiff = -1.0*np.diff(df['pressure'])
         # precipitable water
         pw = np.sum(np.array([mr[_]*100.0*pdiff[_]/9.8 for _ in range(pdiff.shape[0]) ]))
-        print('pw =',pw)
+        if verbose:
+                print('pw =',pw)
         
         # crude estimate of wet bulb temp
         ##tw = df['temperature'][0]- (df['temperature'][0]-df['dewpoint'][0])/3.
@@ -42,7 +47,8 @@ def calcs(df):
         shear6km = np.sqrt(udiff**2 + vdiff**2)
         if (math.isnan(shear6km)):
             shear6km = 0
-        print('shear6km =',shear6km)
+        if verbose:
+                print('shear6km =',shear6km)
 
         # 850mb-200mb Shear
         wspd850mb = df['speed'][np.argmin(abs(df['pressure']-850))]
@@ -56,7 +62,8 @@ def calcs(df):
         shear850200mb = np.sqrt(udiff**2 + vdiff**2)
         if (math.isnan(shear850200mb)):
             shear850200mb = 0
-        print('shear850200mb =',shear850200mb)
+        if verbose:
+                print('shear850200mb =',shear850200mb)
 
         # SFC-700mb Shear
         wspd700mb = df['speed'][np.argmin(abs(df['pressure']-700))]
@@ -68,7 +75,8 @@ def calcs(df):
         shear700mb = np.sqrt(udiff**2 + vdiff**2)
         if (math.isnan(shear700mb)):
             shear700mb = 0
-        print('shear700mb =',shear700mb)
+        if verbose:
+                print('shear700mb =',shear700mb)
 
         return h0,h10,h20,h30,h40,wcd,pw,lcl_height,shear6km,shear850200mb,shear700mb
 
