@@ -129,4 +129,15 @@ def SatVap(tempc,phase="liquid"):
     else:
         raise NotImplementedError
 
+def calculate_dewpoint(T, RH):
+    #Tetens Formual from
+    # https://andrewsforest.oregonstate.edu/sites/default/files/lter/data/studies/ms01/dewpt_vpd_calculations.pdf
 
+    x = np.log(RH/100) + ((17.269*T) / (237.3 + T))
+    Td = (237.3 * x)/(17.269-x)
+        
+    return Td
+
+def CtoK(T):
+        # convert degC to degK
+        return T+273.15
