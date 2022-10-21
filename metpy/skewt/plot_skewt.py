@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Copyright (c) 2016 MetPy Developers.
 # Distributed under the terms of the BSD 3-Clause License.
 # SPDX-License-Identifier: BSD-3-Clause
@@ -28,35 +30,94 @@ from calculations import calcs
 import matplotlib.patheffects as mpatheffects
 import numpy as np
 
-#degC = '$^{\circ}$C'
 degC = '\N{DEGREE CELSIUS}'
 hodo = False
+outpath = '/tmp'
+min_pres = 100.
+max_pres = 1050.
+min_temp = -40.
+max_temp = 40.
+barb_spacing = 25
 
-if len(sys.argv) != 4:
-    print('Usage: {} [input path] [input file] [format (CSU|cdf|MUnc|MUtxt_ws|raw|SBUnc|SBUnc_static|SCOUT|UIUC|UIUCnc|UWYO]'.format(sys.argv[0]))
+if len(sys.argv) != 6:
+    print('Usage: {} [input path] [input file] [output path] [fmt (Albany|CSU|MUnc|MUtxt_ws|NCSU|Purdue|SBUnc|SBUnc_mobile|UIUCnc|UNCA|UWYO|Valpo] [hodograph (True|False)]'.format(sys.argv[0]))
     sys.exit()
 else:
     inpath = sys.argv[1]
     infile = sys.argv[2]
-    format = sys.argv[3]
-    print('indir =',indir,'infile =',infile,'and format =',format)
+    outpath = sys.argv[3]
+    fmt = sys.argv[4]
+    hodo   = sys.argv[5]
+    print('indir =',indir,'infile =',infile,'and fmt =',fmt)
 
 # Test inputs
+inpath = '/home/disk/bob/impacts/upperair/ualbany/20220225'
+infile = 'upperair.sounding.202202250900.Albany-ESSX.txt'
+fmt = 'Albany'
+
+inpath = '/home/disk/monsoon/relampago/raw/sounding/CSU/FIELD/20181105'
+infile = 'edt_20181105_0858.txt'
+inpath = '/home/disk/monsoon/precip/raw/soundings/20220811'
+infile = 'edt_20220811_1200.txt'
+fmt = 'CSU'
+
+inpath = '/home/disk/bob/impacts/upperair/umill/20220219'
+infile = 'upperair.UMILL_sonde.20220219.nc'
+fmt = 'MUnc'
+
+inpath = '/home/disk/bob/impacts/upperair/umill/20220225'
+infile = 'upperair.UMILL_windsonde1.202202250600.txt'
+fmt = 'MUtxt_ws'
+
+inpath = '/home/disk/bob/impacts/upperair/ncsu/20220213'
+infile = ''
+fmt = 'NCSU'
+
+inpath = '/home/disk/bob/impacts/upperair/purdue/20220217'
+infile = '2022-02-17_1509.sounding.csv'
+fmt = 'Purdue'
+
+inpath = '/home/disk/bob/impacts/upperair/rtso/20220213'
+infile = '20220213.1500.rtso'
+fmt = 'RTSO'
+
+inpath = '/home/disk/bob/impacts/upperair/sbu/20220225'
+infile = 'upperair.SBU_sonde_SBUSouthP.202202250525.nc'
+fmt = 'SBUnc'
+
+inpath = '/home/disk/bob/impacts/upperair/sbu/20220129'
+infile = 'upperair.SBU_sonde_RadarTruck.202201290356.nc'
+fmt = 'SBUnc_mobile'
+
 inpath = '/home/disk/bob/impacts/upperair/uill/20220117'
 infile = 'upperair.UILL_sonde.202201170600.nc'
-format = 'UIUCnc'
+fmt = 'UIUCnc'
+
+inpath = '/home/disk/bob/impacts/upperair/unca/20220116'
+infile = 'upperair.UNCA_sonde.202201160600.txt'
+fmt = 'UNCA'
+
+inpath = '/home/disk/bob/impacts/upperair/nws/20221018'
+infile = 'upperair.SkewT.202210181200.ALB.new'
+fmt = 'UWYO'
+
+inpath = '/home/disk/bob/impacts/upperair/valpo/20220217'
+infile = 'upperair.VALPO_sonde.202202172100.csv'
+fmt = 'Valpo'
 
 ###########################################
 # Read sounding data into dataframe with column names as indicated
 # col_names = ['pressure', 'height', 'temperature', 'dewpoint', 'direction', 'speed']
 
-(df,out_fname,figtitle) = read_infile(inpath,infile,format)
+(df,out_fname,figtitle) = read_infile(inpath,infile,fmt)
+if df.empty:
+    sys.exit('Unrecognized fmt =',fmt)
 
 ###########################################
 # We will pull the data out of the example dataset into individual variables and
 # assign units.
 
-hght = df['height'].values * units.hPa
+hght = df['height'].values * units.m
 p = df['pressure'].values * units.hPa
 T = df['temperature'].values * units.degC
 Td = df['dewpoint'].values * units.degC
@@ -104,6 +165,8 @@ skew = SkewT(fig, rotation=45)
 skew.ax.set_title(figtitle,fontsize=13)
 skew.ax.set_ylabel('Pressure (hPa)')
 skew.ax.set_xlabel('Temperature (\N{DEGREE CELSIUS})')
+#skew.ax.grid(axis='x', color='tan')
+skew.ax.grid(axis='x', color='darkgoldenrod')
 
 # Plot the data using normal plotting functions, in this case using
 # log scaling in Y, as dictated by the typical meteorological plot
@@ -112,29 +175,29 @@ skew.plot(p, Td, 'g',linewidth=2.5)
 
 # Plot barbs
 # Set spacing interval--Every 50 mb from 1000 to 100 mb
-my_interval = np.arange(100, 1000, 40) * units('mbar')
+my_interval = np.arange(min_pres,max_pres,barb_spacing) * units('mbar')
 # Get indexes of values closest to defined interval
 ix = mpcalc.resample_nn_1d(p, my_interval)
 # Plot only values nearest to defined interval values
-skew.plot_barbs(p[ix], u[ix], v[ix])
+skew.plot_barbs(p[ix], u[ix], v[ix], linewidth=0.5)
 
 # Plot height values at specified pressure levels on y axis
 fig.text(0.18,0.883,'%.0f m'%(h_levels[0]),fontsize=8)
-fig.text(0.18,0.65,'%.0f m'%(h_levels[1]),fontsize=8)
-fig.text(0.18,0.515,'%.0f m'%(h_levels[2]),fontsize=8)
-fig.text(0.18,0.42,'%.0f m'%(h_levels[3]),fontsize=8)
-fig.text(0.18,0.345,'%.0f m'%(h_levels[4]),fontsize=8)
-fig.text(0.18,0.285,'%.0f m'%(h_levels[5]),fontsize=8)
-fig.text(0.18,0.23,'%.0f m'%(h_levels[6]),fontsize=8)
-fig.text(0.18,0.187,'%.0f m'%(h_levels[7]),fontsize=8)
-fig.text(0.18,0.147,'%.0f m'%(h_levels[8]),fontsize=8)
-fig.text(0.18,0.113,'%.0f m'%(h_levels[9]),fontsize=8)
+fig.text(0.18,0.655,'%.0f m'%(h_levels[1]),fontsize=8)
+fig.text(0.18,0.525,'%.0f m'%(h_levels[2]),fontsize=8)
+fig.text(0.18,0.43,'%.0f m'%(h_levels[3]),fontsize=8)
+fig.text(0.18,0.355,'%.0f m'%(h_levels[4]),fontsize=8)
+fig.text(0.18,0.295,'%.0f m'%(h_levels[5]),fontsize=8)
+fig.text(0.18,0.244,'%.0f m'%(h_levels[6]),fontsize=8)
+fig.text(0.18,0.20,'%.0f m'%(h_levels[7]),fontsize=8)
+fig.text(0.18,0.16,'%.0f m'%(h_levels[8]),fontsize=8)
+fig.text(0.18,0.125,'%.0f m'%(h_levels[9]),fontsize=8)
 
 # Add the relevant special lines
 da_temps = units.Quantity(np.linspace(-40,150,20), 'degC')
 skew.plot_dry_adiabats(t0=da_temps,colors='red',alpha=0.3)
-ma_temps = units.Quantity(np.array([-40, -30, -20, -10, 0, 4, 8, 12, 16, 20, 24, 28, 32, 36]), 'degC')
-ma_pres_levels = units.Quantity(np.linspace(1000.,220.), 'mbar')
+ma_temps = units.Quantity(np.concatenate((np.linspace(-40,0,5),np.linspace(4,36,9))),'degC')
+ma_pres_levels = units.Quantity(np.linspace(max_pres,220.), 'mbar')
 skew.plot_moist_adiabats(t0=ma_temps,pressure=ma_pres_levels,colors='green',alpha=0.3)
 skew.plot_mixing_lines(colors='purple',alpha=0.4)
 
@@ -173,9 +236,8 @@ skew.ax.text(11.5,600,'16',color='purple',fontsize=9,
              path_effects=[mpatheffects.withStroke(foreground='white', linewidth=3)])
 
 # Good bounds
-skew.ax.set_xlim(-40, 40)
-#skew.ax.set_ylim(1000, 100)
-skew.ax.set_ylim(1050, 100)
+skew.ax.set_xlim(min_temp,max_temp)
+skew.ax.set_ylim(max_pres,min_pres)
 
 # Create a hodograph
 if hodo:
@@ -186,3 +248,8 @@ if hodo:
 
 # Show the plot
 plt.show()
+
+# Save the plot
+plt.savefig(outpath+'/'+out_fname)
+
+# Ftp to field catalog
