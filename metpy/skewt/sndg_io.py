@@ -1,4 +1,6 @@
 import os
+import re
+import io
 import sys
 import numpy as np
 import pandas as pd
@@ -273,21 +275,19 @@ def read_sharppy(inpath,infile,fmt):
 
     # Convert speed from m/s to knots
     df['speed'] = df['speed'] * MPS2KTS
-    
-    # Calculate dewpoint and add to dataframe
+
+    # Handle missing values in data
     for key in df.keys():
-	# if missing values in data, have to replace with NaNs and then convet to numeric as it
-        # originaly is read strings instead of float64; coerce flag nicely takes anything that
-        # cannot be converted and puts NaN
+	# Replace missing values with NaNs and then convert to numeric as they are originally read 
+        # as strings instead of float64; coerce flag nicely takes anything that cannot be converted
+        # and substitutes NaN
         if df[key].dtype.name != 'float64':
             df[key] = pd.to_numeric(df[key], errors='coerce')
-        if 'temperature' in key:
-            temp = (df[key][0:])
-        elif 'rh' in key:
-            RH = (df[key][0:])
+
+    # Calculate dewpoint and add to dataframe
     dew = []
-    for i,val in enumerate(RH):
-        dew.append(calculate_dewpoint(temp[i], RH[i]))
+    for i,val in enumerate(df['rh']):
+        dew.append(calculate_dewpoint(df['temperature'][i], df['rh'][i]))
     dewpt = np.asarray(dew)
     df.insert(3, "dewpoint", dewpt, True)
     
@@ -295,8 +295,73 @@ def read_sharppy(inpath,infile,fmt):
 
 def read_RTSO(inpath,infile):
 
-    # Used for WFF soundings
+    # read file header
+    with open(inpath+'/'+infile) as myfile:
+        #head = [next(myfile) for x in xrange(8)]  # for python2
+        head = [next(myfile) for x in range(8)]  # for python3: xrange changed to range
+    dateStr = head[2].strip()
+    stationStr = head[3].strip()
+    latlonStr = head[4].strip()
 
+    # get file time
+    temp = dateStr.split(' ')
+    datetimeStr = temp[1]+' '+temp[4]
+    file_time = datetime.datetime.strptime(datetimeStr,'%m/%d/%Y %H:%M:%S')
+
+    # get station id
+    stn_id = stationStr
+    if stn_id == 'N-179':
+        stn_id_file = 'Wallops_VA'
+        stn_id_plot = 'WAL'
+    else:
+        stn_id_file = 'unknown'
+        stn_id_plot = 'UNK'
+        
+    # get lat/lon
+    temp = latlonStr.split(' ')
+    lat = abs(float(temp[2][:-1]))
+    if temp[2][-1] == 'S':
+        lat = -lat
+    lon = abs(float(temp[4][:-1]))
+    if temp[4][-1] == 'W':
+        lon = -lon
+
+    # define out_fname and figtitle
+    out_fname = 'upperair.SkewT.{dt}.{stn}.png'.format(dt = file_time.strftime(file_out_dt_fmt), stn = stn_id_file)
+    figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id_plot, dt = file_time.strftime(title_dt_fmt), lati=lat, long=lon)
+
+    # read in file after header as DataFrame
+    df = pd.read_csv(inpath+'/'+infile, skiprows=9, delim_whitespace=True)
+
+    #df.columns = ['time (s)','pres (mb)','temp (degC)','rel_hum (%)','geop_ht (m)','dew_pt (degC)',
+    #              'ref_ind (N units)','grad_ref_ind (N/km)','mod_ref_ind (M units)','speed_snd (m/s)',
+    #              'air_dens (g/m3)','vap_pres (mb)','pot_temp (degC)','vir_temp (degC)','spec_hum (g/kg)',
+    #              'spare1','spare2','spare3','spare4','utc_time (s)','wspd (m/s)','wdir (deg)',
+    #              'ns_wind_comp (m/s)','ew_wind_comp (m/s)','vert_wind_comp (m/s)','lon (deg)','lat (deg)',
+    #              'geom_ht (m)']
+
+    df.columns = ['time (s)','pressure','temperature','rel_hum (%)','geop_ht (m)','dewpoint',
+                  'ref_ind (N units)','grad_ref_ind (N/km)','mod_ref_ind (M units)','speed_snd (m/s)',
+                  'air_dens (g/m3)','vap_pres (mb)','pot_temp (degC)','vir_temp (degC)','spec_hum (g/kg)',
+                  'spare1','spare2','spare3','spare4','utc_time (s)','speed','direction',
+                  'ns_wind_comp (m/s)','ew_wind_comp (m/s)','vert_wind_comp (m/s)','lon (deg)','lat (deg)',
+                  'height']
+
+    # Handle missing values in data
+    for key in df.keys():
+	# Replace missing values with NaNs and then convert to numeric as they are originally read 
+        # as strings instead of float64; coerce flag nicely takes anything that cannot be converted
+        # and substitutes NaN
+        if df[key].dtype.name != 'float64':
+            df[key] = pd.to_numeric(df[key], errors='coerce')
+
+    # Remove rows with pressure val = NaN; we need this for plotting wind barbs
+    df = df[df['pressure'].notna()]
+    df = df[df['dewpoint'].notna()]
+            
+    # Convert wind speed from m/s to knots
+    df['speed'] = df['speed'] * MPS2KTS
+    
     return df, out_fname, figtitle
 
 def read_nc_file(inpath,infile,fmt):
@@ -403,6 +468,75 @@ def read_UIUCnc(inpath,infile):
 
 def read_UNCA(inpath,infile):
 
+    # read file header
+    #with open(inpath+'/'+infile, encoding="latin1") as myfile:
+    with io.open(inpath+'/'+infile, encoding="cp1252") as myfile:
+        #head = [next(myfile) for x in xrange(8)]  # for python2
+        head = [next(myfile) for x in range(22)]  # for python3: xrange changed to range
+    dateStr = head[-1].strip()
+    stationStr = head[3].strip()
+    latStr = head[7].strip()
+    lonStr = head[8].strip()
+    #columns = head[50].strip().split()
+
+    # get file time
+    temp = dateStr.split()
+    datetimeStr = temp[3]+' '+temp[4]
+    AmPm = temp[5]
+    file_time = datetime.datetime.strptime(datetimeStr,'%m/%d/%Y %H:%M:%S')
+    if AmPm == 'PM':
+        file_time = file_time + datetime.timedelta(hours=12)
+
+    # get station id
+    temp = stationStr.split(':')
+    stn_id_file = temp[1].strip().replace(' ','_')
+    stn_id_plot = 'UNCA'
+        
+    # get lat/lon
+    temp = latStr.split()
+    (deg,min,sec,dir) = re.sub(r"[^a-zA-Z0-9\. ]", " ", temp[-1]).split()
+    lat = dirMinSec2deg(float(deg),float(min),float(sec),dir)
+
+    temp = lonStr.split()
+    (deg,min,sec,dir) = re.sub(r"[^a-zA-Z0-9\. ]", " ", temp[-1]).split()
+    lon = dirMinSec2deg(float(deg),float(min),float(sec),dir)
+
+    # define out_fname and figtitle
+    out_fname = 'upperair.{stn}_sonde.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
+    figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id_file, dt = file_time.strftime(title_dt_fmt), lati=lat, long=lon)
+
+    # find data for plotting past header and significant levels
+    with io.open(inpath+'/'+infile, encoding="cp1252") as f:
+        for num,line in enumerate(f,1):
+            newline = line.strip()
+            if newline.startswith('FltTime'):
+                linenum = num
+                #print(linenum)
+                break
+
+    with io.open(inpath+'/'+infile, encoding="cp1252") as f:
+        lines = f.readlines()
+        data = lines[linenum+2:]
+        fout = open('/tmp/sndg.dat','w')
+        for num,line in enumerate(data):
+            fout.write(data[num])
+        fout.close()
+        
+    df = pd.read_csv('/tmp/sndg.dat', skiprows=0, encoding='latin1', delim_whitespace=True, header=None)
+    df.columns = (['FltTime','pressure','temperature','rh','speed','direction','height'])
+
+    # add dewpoint to dataframe
+    dew = []
+    for i,val in enumerate(df['rh']):
+        dew.append(calculate_dewpoint(df['temperature'][i], df['rh'][i]))
+    dewpt = np.asarray(dew)
+    df.insert(3, "dewpoint", dewpt, True)
+
+    # convert wind speed from m/s to knots
+    df['speed'] = df['speed'] * MPS2KTS
+
+    os.remove('/tmp/sndg.dat')
+        
     return df, out_fname, figtitle
 
 def read_UWYO(inpath,infile):
@@ -548,7 +682,6 @@ def dirMinSec2deg(deg,min,sec,dir):
     if dir == 'W' or dir == 'S':
         val = -val
     return val
-
 
 
 

@@ -140,6 +140,8 @@ fig = plt.figure(figsize=(10, 9))
 
 # Write data values in right column of plot
 fig.text(0.86,0.85,'Sounding Params', fontsize=10)
+
+# THIS CALL DOESN'T WORK FOR RTSO DATA - can't calculate pw
 (h0,h10,h20,h30,h40,wcd,pw,lcl_height,shear6km,shear850200mb,shear700mb) = calcs(df)
 fig.text(0.86,0.83,  '0%s: %.0f m'%(degC, h0))
 fig.text(0.86,0.81,'-10%s: %.0f m'%(degC, h10))

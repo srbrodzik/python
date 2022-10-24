@@ -24,13 +24,16 @@ def calcs(df):
         wcd = h0 - lcl_height
         if verbose:
                 print('wcd =',wcd)
-        
+
         # SRB: removed this formula for mixing ratio and reverted to orig definition
         #mr = MixRatio(SatVap(df['dewpoint'][0]), df['pressure']*100)
         mr = MixRatio(SatVap(df['dewpoint']), df['pressure']*100)
         pdiff = -1.0*np.diff(df['pressure'])
         # precipitable water
-        pw = np.sum(np.array([mr[_]*100.0*pdiff[_]/9.8 for _ in range(pdiff.shape[0]) ]))
+        try:
+                pw = np.sum(np.array([mr[_]*100.0*pdiff[_]/9.8 for _ in range(pdiff.shape[0]) ]))
+        except:
+                pw = -999
         if verbose:
                 print('pw =',pw)
         
