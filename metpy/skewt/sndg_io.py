@@ -47,17 +47,17 @@ siteList = {'ABR':'Aberdeen_SD',
             'TBW':'Tampa_Bay_FL',
             'WAL':'Wallops_VA'}
 
-def read_infile(inpath,infile,fmt):
+def read_infile(inpath,infile,fmt,lat,lon):
     if fmt in ['Albany_mobile','Albany']:
         (df,out_fname,figtitle) = read_Albany(inpath,infile,fmt)
     elif fmt in ['CMICH','UNCA']:
-        (df,out_fname,figtitle) = read_TSPOTINT(inpath,infile,fmt)
+        (df,out_fname,figtitle) = read_TSPOTINT(inpath,infile,fmt,lat,lon)
     elif fmt == 'CSU':
         (df,out_fname,figtitle) = read_CSU(inpath,infile)
     elif fmt in ['MUtxt_ws','Oswego']:
         (df,out_fname,figtitle) = read_MUtxt_ws(inpath,infile)
     elif fmt in ['NCSU','Purdue','UNDws','HsinChu']:
-        (df,out_fname,figtitle) = read_sharppy(inpath,infile,fmt)
+        (df,out_fname,figtitle) = read_sharppy(inpath,infile,fmt,lat,lon)
     #elif fmt in ['Oswego']:
     #    (df,out_fname,figtitle) = read_sharppy2(inpath,infile)
     elif fmt == 'RTSO':
@@ -94,11 +94,13 @@ def read_Albany(inpath,infile,fmt):
     if fmt == 'Albany':
         stn_id = 'Albany'
         stn_id_plot = 'UAlbany'
-        out_fname = 'upperair.UALB_sonde.{dt}.Albany_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        #out_fname = 'upperair.UALB_sonde.{dt}.Albany_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        out_fname = 'upperair.UALB.{dt}.Albany_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
     elif fmt == 'Albany_mobile':
         stn_id = 'Albany_Mobile'
         stn_id_plot = 'UAlbany_Mobile'
-        out_fname = 'upperair.UALB_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        #out_fname = 'upperair.UALB_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        out_fname = 'upperair.UALB.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
 
     stn_id_file = 'UALB'
 
@@ -156,15 +158,17 @@ def read_Albany(inpath,infile,fmt):
 
     return df2, out_fname, figtitle
 
-def read_TSPOTINT(inpath,infile,fmt):
+def read_TSPOTINT(inpath,infile,fmt,lat,lon):
 
     # Since lat and lon are in a separate file, hardwire lat and lon
-    if fmt == 'CMICH':
-        lat = 43.5762
-        lon = -84.7735
-    elif fmt == 'UNCA':
-        lat = 35.6196
-        lon = -82.5674
+    #if fmt == 'CMICH':
+    #    lat = 43.5762
+    #    lon = -84.7735
+    #elif fmt == 'UNCA':
+    #    lat = 35.6196
+    #    lon = -82.5674
+    lat = float(lat)
+    lon = float(lon)
 
     # Get datetime info from filename
     (category,snd_id,dateTimeStr,ext) = infile.split('.')
@@ -273,7 +277,8 @@ def read_CSU(inpath,infile):
     lon_grnd = lon[0]
     file_time_string = infile[4:17]
     file_time = datetime.datetime.strptime(file_time_string, file_in_dt_fmt_CSU)
-    out_fname = 'upperair.CSU_sonde.{dt}.skewT.png'.format(dt=file_time.strftime(file_out_dt_fmt))
+    #out_fname = 'upperair.CSU_sonde.{dt}.skewT.png'.format(dt=file_time.strftime(file_out_dt_fmt))
+    out_fname = 'upperair.CSU.{dt}.skewT.png'.format(dt=file_time.strftime(file_out_dt_fmt))
     figtitle = 'CSU {dt} sounding ({lat:.3f} {lon:.3f})'.format(dt=file_time.strftime(title_dt_fmt), lat=lat_grnd, lon=lon_grnd)
 
     return df, out_fname, figtitle
@@ -368,7 +373,7 @@ def read_MUtxt_ws(inpath,infile):
         
     return df, out_fname, figtitle
 
-def read_sharppy(inpath,infile,fmt):
+def read_sharppy(inpath,infile,fmt,lat,lon):
 
     # Assumes infile naming convention is one of these:
     # upperair.NCSU_sonde.202212271200.txt
@@ -397,21 +402,24 @@ def read_sharppy(inpath,infile,fmt):
             lat = float(latStr[:-1])
             lon = float(lonStr[:-1])
         else:
-            if fmt == 'NCSU':
-                lat = 35.7818
-                lon = -78.6766
-            elif fmt == 'Purdue':
-                lat = 40.4302
-                lon = -86.9154
-            elif fmt == 'UNDws':
-                lat = 47.3896
-                lon = -94.6974
-            elif fmt == 'HsinChu':
-                lat = 24.8279
-                lon = 121.0142
-            else:  # Unknown location - use 0/0
-                lat = 0.0
-                lon = 0.0
+            #if fmt == 'NCSU':
+            #    lat = 35.7818
+            #    lon = -78.6766
+            #elif fmt == 'Purdue':
+            #    lat = 40.4302
+            #    lon = -86.9154
+            #elif fmt == 'UNDws':
+            #    lat = 47.3896
+            #    lon = -94.6974
+            #elif fmt == 'HsinChu':
+            #    lat = 24.8279
+            #    lon = 121.0142
+            #else:  # Unknown location - use 0/0
+            #    lat = 0.0
+            #    lon = 0.0
+            lat = float(lat)
+            lon = float(lon)
+
     else:
         print('No date/time given ... assign Jan 1, 2000')
         datetimeStr = '000101/0000'
@@ -618,13 +626,16 @@ def read_nc_file(inpath,infile,fmt):
 
     if fmt == 'SBUnc_mobile':
         stn_id = 'SBU_Mobile'
-        out_fname = 'upperair.SBU_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        #out_fname = 'upperair.SBU_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        out_fname = 'upperair.SBU.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
     elif fmt == 'SBUnc':
         stn_id = 'SBU'
-        out_fname = 'upperair.SBU_sonde.{dt}.Stonybrook_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        #out_fname = 'upperair.SBU_sonde.{dt}.Stonybrook_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        out_fname = 'upperair.SBU.{dt}.Stonybrook_NY_skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
     elif fmt == 'MUnc':
         stn_id = 'UMILL'
-        out_fname = 'upperair.UMILL_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        #out_fname = 'upperair.UMILL_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+        out_fname = 'upperair.UMILL.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
     
     figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id, dt = file_time.strftime(title_dt_fmt), lati=lat, long=lon)
             
@@ -677,7 +688,8 @@ def read_UIUCnc(inpath,infile):
         lon *= -1
     if location_list[2] == 'south':
         lat *= -1
-    out_fname = 'upperair.UILL_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+    #out_fname = 'upperair.UILL_sonde.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
+    out_fname = 'upperair.UILL.{dt}.skewT.png'.format(dt = file_time.strftime(file_out_dt_fmt))
     figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id, dt = figure_time.strftime(title_dt_fmt), lati=lat, long=lon)
 
     # read input data into dataframe object
@@ -789,7 +801,8 @@ def read_gfk(inpath,infile):
     df['height'] = df['height'] * KM2M
 
     # define out_fname and figtitle
-    out_fname = 'upperair.{stn}_sonde.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
+    #out_fname = 'upperair.{stn}_sonde.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
+    out_fname = 'upperair.{stn}.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
     figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id_plot, dt = file_time.strftime(title_dt_fmt), lati=lat, long=lon)
 
     return df, out_fname, figtitle
@@ -874,7 +887,8 @@ def read_gfk_csv(inpath,infile):
     df['height'] = df['height'] * KM2M
 
     # define out_fname and figtitle
-    out_fname = 'upperair.{stn}_sonde.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
+    #out_fname = 'upperair.{stn}_sonde.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
+    out_fname = 'upperair.{stn}.{dt}.skewT.png'.format(stn = stn_id_file, dt = file_time.strftime(file_out_dt_fmt))
     figtitle = '{stn} {dt} sounding ({lati:.3f}, {long:.3f})'.format(stn = stn_id_plot, dt = file_time.strftime(title_dt_fmt), lati=lat, long=lon)
 
     return df, out_fname, figtitle

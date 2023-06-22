@@ -60,6 +60,8 @@ parser.add_argument('--fmt', action="store", dest="fmt", required=True, default=
 parser.add_argument('--hodo', action='store', dest='hodo', default=False, help='True or False (default=False)')
 parser.add_argument('--wb', action='store', dest='wb', default=False, help='True or False (default=False)')
 parser.add_argument('--vlim', action='store', dest='vlim', default=7, help='vertical extent in km (default=7)')
+parser.add_argument('--lat', action='store', dest='lat', default=0.0, help='site latitude (overridden if value in input file)')
+parser.add_argument('--lon', action='store', dest='lon', default=0.0, help='site longitude (overridden if value in input file)')
 pargs = parser.parse_args()
 
 try:
@@ -91,12 +93,14 @@ if debug:
     print('   hodo    =',pargs.hodo)
     print('   wb      =',pargs.wb)
     print('   vlim    =',pargs.vlim)
+    print('   lat     =',pargs.lat)
+    print('   lon     =',pargs.lon)
 
 ###########################################
 # Read sounding data into dataframe with column names as indicated
 # col_names = ['pressure', 'height', 'temperature', 'dewpoint', 'direction', 'speed']
 
-(df,out_fname,figtitle) = read_infile(pargs.inpath,pargs.infile,pargs.fmt)
+(df,out_fname,figtitle) = read_infile(pargs.inpath,pargs.infile,pargs.fmt,pargs.lat,pargs.lon)
 if debug:
     print('FOR SKEWT:')
     print('   out_fname =',out_fname)
