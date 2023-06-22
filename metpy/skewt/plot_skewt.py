@@ -12,15 +12,21 @@ plot_skewt
 ==========
 
 Layout a Skew-T plot with an optional hodograph inset into the plot.
+There is an option to create a wet bulb temperature plot as well.
+
+For testing:
+./plot_skewt.py --inpath /home/disk/bob/impacts/upperair/sbu/20220517 --infile upperair.SBU_sonde.202205171809.RadarTruck.nc --outpath /tmp --fmt SBUnc_mobile --hodo false --wb false --vlim
+
 """
 
+import os
 import sys
 sys.path.append('/home/disk/meso-home/brodzik/python/metpy/skewt')
 
+import argparse
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import pandas as pd
-
 import metpy.calc as mpcalc
 from metpy.cbook import get_test_data
 from metpy.plots import add_metpy_logo, Hodograph, SkewT
@@ -29,89 +35,74 @@ from sndg_io import read_infile
 from calculations import calcs
 import matplotlib.patheffects as mpatheffects
 import numpy as np
+from ftplib import FTP
+import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
+from wetbulb import plot_wb
+from wetbulb import calc_wetbulb_temp
 
+KM2FEET = 3280.84
 degC = '\N{DEGREE CELSIUS}'
-hodo = False
-outpath = '/tmp'
 min_pres = 100.
 max_pres = 1050.
 min_temp = -40.
 max_temp = 40.
 barb_spacing = 25
+debug = False
 
-if len(sys.argv) != 6:
-    print('Usage: {} [input path] [input file] [output path] [fmt (Albany|CSU|MUnc|MUtxt_ws|NCSU|Purdue|SBUnc|SBUnc_mobile|UIUCnc|UNCA|UWYO|Valpo] [hodograph (True|False)]'.format(sys.argv[0]))
-    sys.exit()
-else:
-    inpath = sys.argv[1]
-    infile = sys.argv[2]
-    outpath = sys.argv[3]
-    fmt = sys.argv[4]
-    hodo   = sys.argv[5]
-    print('indir =',indir,'infile =',infile,'and fmt =',fmt)
+# Parse input arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--inpath', action='store', dest='inpath', default='.')
+parser.add_argument('--infile', action="store", dest="infile", required=True, default=None)
+parser.add_argument('--outpath', action='store', dest='outpath', default='.')
+parser.add_argument('--fmt', action="store", dest="fmt", required=True, default='', help='Albany|CMICH|CSU|HsinChu|MUnc|MUtxt_ws|NCSU|Oswego|Purdue|SBUnc|SBUnc_mobile|UIUCnc|UNCA|UND|UNDws|UWYO|Valpo')
+parser.add_argument('--hodo', action='store', dest='hodo', default=False, help='True or False (default=False)')
+parser.add_argument('--wb', action='store', dest='wb', default=False, help='True or False (default=False)')
+parser.add_argument('--vlim', action='store', dest='vlim', default=7, help='vertical extent in km (default=7)')
+pargs = parser.parse_args()
 
-# Test inputs
-inpath = '/home/disk/bob/impacts/upperair/ualbany/20220225'
-infile = 'upperair.sounding.202202250900.Albany-ESSX.txt'
-fmt = 'Albany'
+try:
+    if pargs.hodo.lower() == 'false':
+        pargs.hodo = False
+    else:
+        if debug:
+            print('   Improper hodo flag. Use \"False\" to turn off the hodograph plot.')
+        pargs.hodo = True
+except:
+    pass
 
-inpath = '/home/disk/monsoon/relampago/raw/sounding/CSU/FIELD/20181105'
-infile = 'edt_20181105_0858.txt'
-inpath = '/home/disk/monsoon/precip/raw/soundings/20220811'
-infile = 'edt_20220811_1200.txt'
-fmt = 'CSU'
+try:
+    if pargs.wb.lower() == 'false':
+        pargs.wb = False
+    else:
+        if debug:
+            print('   Improper wb flag. Use \"False\" to turn off the hodograph plot.')
+        pargs.wb = True
+except:
+    pass
 
-inpath = '/home/disk/bob/impacts/upperair/umill/20220219'
-infile = 'upperair.UMILL_sonde.20220219.nc'
-fmt = 'MUnc'
-
-inpath = '/home/disk/bob/impacts/upperair/umill/20220225'
-infile = 'upperair.UMILL_windsonde1.202202250600.txt'
-fmt = 'MUtxt_ws'
-
-inpath = '/home/disk/bob/impacts/upperair/ncsu/20220213'
-infile = ''
-fmt = 'NCSU'
-
-inpath = '/home/disk/bob/impacts/upperair/purdue/20220217'
-infile = '2022-02-17_1509.sounding.csv'
-fmt = 'Purdue'
-
-inpath = '/home/disk/bob/impacts/upperair/rtso/20220213'
-infile = '20220213.1500.rtso'
-fmt = 'RTSO'
-
-inpath = '/home/disk/bob/impacts/upperair/sbu/20220225'
-infile = 'upperair.SBU_sonde_SBUSouthP.202202250525.nc'
-fmt = 'SBUnc'
-
-inpath = '/home/disk/bob/impacts/upperair/sbu/20220129'
-infile = 'upperair.SBU_sonde_RadarTruck.202201290356.nc'
-fmt = 'SBUnc_mobile'
-
-inpath = '/home/disk/bob/impacts/upperair/uill/20220117'
-infile = 'upperair.UILL_sonde.202201170600.nc'
-fmt = 'UIUCnc'
-
-inpath = '/home/disk/bob/impacts/upperair/unca/20220116'
-infile = 'upperair.UNCA_sonde.202201160600.txt'
-fmt = 'UNCA'
-
-inpath = '/home/disk/bob/impacts/upperair/nws/20221018'
-infile = 'upperair.SkewT.202210181200.ALB.new'
-fmt = 'UWYO'
-
-inpath = '/home/disk/bob/impacts/upperair/valpo/20220217'
-infile = 'upperair.VALPO_sonde.202202172100.csv'
-fmt = 'Valpo'
+if debug:
+    print('TOP OF plot_skewt:')
+    print('   inpath  =',pargs.inpath)
+    print('   infile  =',pargs.infile)
+    print('   outpath =',pargs.outpath)
+    print('   fmt     =',pargs.fmt)
+    print('   hodo    =',pargs.hodo)
+    print('   wb      =',pargs.wb)
+    print('   vlim    =',pargs.vlim)
 
 ###########################################
 # Read sounding data into dataframe with column names as indicated
 # col_names = ['pressure', 'height', 'temperature', 'dewpoint', 'direction', 'speed']
 
-(df,out_fname,figtitle) = read_infile(inpath,infile,fmt)
+(df,out_fname,figtitle) = read_infile(pargs.inpath,pargs.infile,pargs.fmt)
+if debug:
+    print('FOR SKEWT:')
+    print('   out_fname =',out_fname)
+    print('   figtitle  =',figtitle)
 if df.empty:
-    sys.exit('Unrecognized fmt =',fmt)
+      sys.exit('Unable to create plot for file = '+pargs.inpath+'/'+pargs.infile)
 
 ###########################################
 # We will pull the data out of the example dataset into individual variables and
@@ -242,16 +233,32 @@ skew.ax.set_xlim(min_temp,max_temp)
 skew.ax.set_ylim(max_pres,min_pres)
 
 # Create a hodograph
-if hodo:
+if debug:
+    print('Decide whether to add hodograph: hodo =',pargs.hodo)
+if pargs.hodo:
+    if debug:
+        print('   Will create hodograph')
     ax_hod = inset_axes(skew.ax, '25%', '25%', loc=1)
     h = Hodograph(ax_hod, component_range=80.)
     h.add_grid(increment=20)
     h.plot_colormapped(u, v, hght)
 
 # Show the plot
-plt.show()
+#plt.show()
 
 # Save the plot
-plt.savefig(outpath+'/'+out_fname)
+plt.savefig(pargs.outpath+'/'+out_fname)
 
-# Ftp to field catalog
+# Plot wetbulb plot if desired
+if pargs.wb:
+    (base,ext) = os.path.splitext(out_fname)
+    (category,platform,datetime,product) = base.split('.')
+    if 'skewT' not in product:
+        product = product+'_Wet_Bulb'
+    else:
+        product = product.replace('skewT','Wet_Bulb')
+    wb_out_fname = category+'.'+platform+'.'+datetime+'.'+product+ext
+        
+    plot_wb(df, pargs.outpath, wb_out_fname, figtitle, pargs.vlim)
+
+

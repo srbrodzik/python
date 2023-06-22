@@ -5,7 +5,7 @@
 
 import os
 
-indir = '/home/disk/bob/gpm/hdf_subsetted/2Ku/2022/10'
+indir = '/home/disk/bob/gpm/hdf_subsetted/2Ku/2023/06'
 
 actual_orbits = []
 for file in os.listdir(indir):

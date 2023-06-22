@@ -1,0 +1,9 @@
+Steps for processing and producing realtime rainfall map
+
+1. Get the data, via network or some other means
+2. Grid the data, using either RadxConvert or PyART
+3. Clutter filter? Should be something in CSU Radartools
+4. Apply convective/stratiform algorithm with the one provided by Brenda
+5. Rainfall calculations, should be using tropical algorithm provided by Brenda
+6. Map and plot it!
+7. Apply tracking algorithm?? I will have to work on that.

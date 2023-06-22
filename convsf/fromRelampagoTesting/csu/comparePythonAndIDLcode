@@ -1,0 +1,18 @@
+								IDL	Pyt
+absConvThres        = value used in cosine function		 64	64	b
+minZdiff            = value used in cosine function		 10	 8	a
+truncZconvThres     = refl threshold above which point is	 40	42	CoreThresh
+                      automatically a convective core  		 	
+dBZforMaxConvRadius = min core dBZ for max conv radius mask	 40	42	tune_thresh
+		      (Powell used truncZconvThres + 5)
+applyRadMask        = 1 for on, 0 for off  	       		  1		assumed?
+minRadius           = minimum radius for consf output (in km)	 12	15	sm_rad
+mindBZuse           = minimum dBZ for echo     	      	  	-50	
+weakEchoThres       = weak echo threshold			  5	
+bkgrndRadius        = radius of background mask			 11	
+maxConvRadius       = maximum convective radius (in km)		  5
+		    *****Do I have bkgrndRadius & maxConvRadius swapped??*****
+bkgrndPixelFlag     = 0=pixel, 1=bkgrnd	 	    		  1	
+		      	       					  	25	fill_dbz
+									10	bg_diff
+									

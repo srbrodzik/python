@@ -11,9 +11,10 @@ else:
 
 binDir = '/home/disk/meso-home/brodzik/python/gpm/for_web_site/v07'
     
-years = ['2022']
-months = ['09']
-#years = ['2018']
+years = ['2023']
+months = ['05']
+#years = ['2017']
+#months = ['03','04','05','06','07','08','09','10','11','12']
 #months = ['01','02','03','04','05','06','07','08','09','10','11','12']
 
 for year in years:

@@ -1,0 +1,13 @@
+/home/rmet/SPURS2/realtime_radar/rain_figs/20170901_000018_rraccum.png  
+/home/rmet/SPURS2/realtime_radar/rain_figs/20170901_000357_rraccum.png  
+/home/rmet/SPURS2/realtime_radar/rain_figs/20170901_000735_rraccum.png  
+/home/rmet/SPURS2/realtime_radar/rain_figs/20170901_001112_rraccum.png  
+/home/rmet/SPURS2/realtime_radar/rain_figs/20170901_001451_rraccum.png  
+
+
+
+
+
+
+
+

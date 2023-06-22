@@ -1,0 +1,137 @@
+# jenkins:
+#   host: http://jenkins.example.com
+#   user: donny
+#   token: I@m7h3W4lrU$
+# db:
+#   host: http://mysql.example.com
+#   user: lebowski
+# repo: /path/to/directory
+# require:
+
+base_path: /home/rmet/SPURS2/realtime_radar
+
+rhi_range_correction: True
+qc_flag: True
+unfold_flag: True
+
+path1: raw_radar_data
+ftype1: ''
+prefix1: SEA
+raw_ftype: ''
+
+path2: realtime_cfradial
+ftype2: .nc
+prefix2: SEA
+
+qc_data_path: realtime_cfradial
+qc_ftype: .nc
+qc_prefix: SEA
+
+path3: realtime_gridded
+ftype3: .nc
+prefix3: SEAPOL_grid_
+
+grid_data_path: realtime_gridded
+grid_ftype: .nc
+grid_prefix: SEAPOL_grid
+
+rain_data_path: rainfall_arrays
+rain_ftype: .npz
+rain_prefix : ''
+
+
+
+path4: realtime_processed
+ftype4: .nc
+
+nsweeps_thresh: 3
+
+orig_phase_name: PHIDP2
+qc_phase_name: PHIDP2
+phase_name: PF
+
+
+orig_vel_name: VEL2
+qc_vel_name: VEL2
+vel_name: CV
+
+orig_sq_name: SQI2
+qc_vel_name: SQI2
+sq_name: SQ
+
+# Reflectivity, in DROPS, will undergo a first QC with python, then a final QC with DROPS
+# so it'll have to have 3 different names
+# This is the name in the raw data file
+orig_dz_name: DBZ2
+# Here is the Pyart QC'ed reflectivity name
+qc_dz_name: DZQC
+# Here is the final reflectivity name
+dz_name: CZ
+
+orig_zdr_name: ZDR2
+qc_zdr_name: ZDR
+zdr_name: CR
+
+orig_kdp_name: KDP2
+qc_kdp_name: KDP
+kdp_name: KD
+
+orig_rho_name: RHOHV2
+qc_rho_name: CC
+rho_name: CC
+
+
+
+# phase_name: PHIDP2
+
+# vel_name: VEL2
+
+# sq_name: SQI2
+
+# orig_dz_name: DBZ2
+# dz_name: DZQC
+
+# zdr_name: ZDR2
+
+# orig_kdp_name: KDP2
+# kdp_name: KDP
+
+# orig_rho_name: RHOHV2
+# rho_name: CC
+
+
+sdp_thresh: 13
+despeckle_gates: 4
+sq_thresh: 0.35
+rho_thresh: 0.85
+
+lat_width: 2.25
+lon_width: 2.5
+
+lat_width_zoom: 1.0
+lon_width_zoom: 1.0
+
+map_limits:
+  lat: [17.5, 26.0]
+  lon: [-123.0, -116.0]
+
+map_res: 1.0
+
+z_val: 2.0
+z_bot: 0.5
+z_top: 3.0
+
+saved_data_path: saved_data
+default_dtime: 5.0
+accum_lag_thresh: 20.0
+
+rain_search_range: 5.0
+rain_search_thresh: 5.0
+
+accum_search_range: 5.0
+accum_search_thresh: 5.0
+
+rainfall_age_thresh: 480.0
+save_data_thresh: 12
+
+rain_method: composite # can be either slant or composite

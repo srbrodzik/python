@@ -1,0 +1,290 @@
+pro convsf_dynamo_dir_all,res,verbose=ver,statistics=stats,netcdf=nc
+
+  if (n_params(0) LT 1) or keyword_set(hlp) then begin
+     print,'Usage: convsf_dynamo_dir_all,res,/verbose,/statistics,/netcdf'
+     return
+  endif 
+
+  Compile_Opt idl2
+  CS_CORE = 3
+  NO_SFC_ECHO = 0
+  SF = 1
+  CONV = 2
+  WEAK_ECHO = 3
+
+  ;;------------------
+  ;; BEGIN INPUTS HERE
+  ;;------------------
+  date = ['20111016']
+  inputDir = '/home/disk/mjo/dynamo/data.server/interp/QCed/spolka/sur_1km_cf/refl'
+  inPrefix = 'radar'
+  fieldName = 'REFL'
+  level = 5
+  outputDir = '/home/disk/mjo/dynamo/zeb-data/spolka_qc_sur_convsf'
+  outPrefix = 'convsf_'
+
+  absConvThres = 64
+  minZdiff = 10
+  truncZconvThres = 40
+  dBZforMaxConvRadius = 40
+  applyRadMask = 1
+  minRadius = 12
+  mindBZuse = -50
+  weakEchoThres = 5
+  bkgrndRadius = 11
+  maxConvRadius = 5
+  bkgrndPixelFlag = 1
+  otherFields = 0
+
+  ;--------------
+  ; END OF INPUTS
+  ;--------------
+
+  numDates = n_elements(date)
+
+  ;; Process each date
+  for idate=0,numDates-1 do begin
+
+     files = FindFile(inputDir+'/'+date[idate]+'/'+inPrefix+'.*.nc',count=numFiles)
+     if keyword_set(ver) then begin
+        print,'numFiles = ',numFiles
+     endif 
+
+     if numFiles gt 0 then begin
+
+        for ifile = 0, numFiles-1 do begin
+
+            print,'file = ',files[ifile]
+	      
+            ;;---------------------------------
+            ;; Get dimension info for fieldName
+            ;;---------------------------------
+            get_cdf_dims,files[ifile],fieldName,ndims,dimName,dimVal,errFlag1
+            get_dims_xyzt,dimName,dimVal,xsize,ysize,zsize,tsize,errFlag2
+            if errFlag1 + errFlag2 ne 0 then begin
+               print,'   Unable to get dim info from ',files[ifile],'.  Exiting.'
+               return
+            endif 
+	    xsize = 300
+	    ysize = 300
+	    zsize = 40
+	    tsize = 1
+
+            ;;-------------------------
+            ;; Get info from input file
+            ;;-------------------------
+            errFlag = make_array(12,/integer,value=0)  
+            get_cdf_var,files[ifile],'time',time_id,timeArray,errFlag[0]
+            get_cdf_var,files[ifile],'x0',x0_id,x0Array,errFlag[1]
+            get_cdf_var,files[ifile],'y0',y0_id,y0Array,errFlag[2]
+            get_cdf_var,files[ifile],'z0',z0_id,z0Array,errFlag[3]
+            get_cdf_var,files[ifile],fieldName,fieldName_id,reflArray,errFlag[4]
+            get_cdf_att2,files[ifile],fieldName,'_FillValue',missingVal,errFlag[5]
+            if total(errFlag) ne 0 then begin
+               print,'   Unable to get info from ',files[ifile],'.  Exiting.'
+               return
+            endif
+
+	    xspacing = x0Array[1]-x0Array[0]
+	    yspacing = y0Array[1]-y0Array[0]
+	    zspacing = z0Array[1]-z0Array[0]
+
+	    ;;-------------------------------------
+            ;; Get level of reflArray we want to use
+            ;;-------------------------------------
+            size2D = xsize*ysize
+            refl2dArray = reflArray[level*size2D:(level*size2D)+size2D-1]
+
+            ;;------------------
+            ;; Declare 1D arrays
+            ;;------------------
+            borderMaskArray = fltarr(xsize*ysize)
+            convsfArray = make_array(xsize*ysize,/float,val=missingVal)
+            bkgrndArray = make_array(xsize*ysize,/float,val=missingVal)
+            convCoreArray = make_array(xsize*ysize,/integer,val=0)
+
+            ;;-----------------------
+            ;; BACKGROUND WINDOW MASK
+            ;;-----------------------
+            ;; Initialize
+            ;;   bkgrndRadius in km; determine size of winMaskArray in pixels
+            ;;   bdgwindiameter must be odd to have pixel centered
+            maxBdgWinDiameter = fix( floor((float(bkgrndRadius)/xspacing)*2) )
+            if floor(maxBdgWinDiameter/2) eq maxBdgWinDiameter/2.0 then $
+               maxBdgWinDiameter++
+            winMaskArray = fltarr(maxBdgWinDiameter*maxBdgWinDiameter)
+            ;; Create
+            radial_distance_mask,0,bkgrndRadius,maxBdgWinDiameter,maxBdgWinDiameter, $
+                                 xspacing,yspacing,1,0,winMaskArray
+
+            if keyword_set(ver) then begin
+               print,'   Done creating mask for background calcs'
+            endif 
+
+            ;;-----------------
+            ;; CONVECTIVE MASKS
+            ;;-----------------
+            ;; Initialize
+            ;;   maxConvRadius in km; figure out max size in pixels
+            ;;     of convective regions around conv core
+            ;;   maxconvdiameter must be odd to have pixel centered
+            maxConvDiameter = fix( floor((float(maxConvRadius)/xspacing)*2) ) ;
+            if floor(maxConvDiameter/2) eq maxConvDiameter/2.0 then $
+               maxConvDiameter++
+            convMaskArrayAll = make_array(maxConvDiameter,maxConvDiameter, $
+                                         maxConvRadius,/integer,value=0)
+            ;; Create (NOTE: 2nd param is radius in KM) 
+            for iradius=0,maxConvRadius-1 do begin
+               mask = make_array(maxConvDiameter,maxConvDiameter,/integer,value=0)
+               iret = execute('radial_distance_mask,0,'+strcompress(string(iradius+1),/remove_all)+  $
+                              ',maxConvDiameter,maxConvDiameter,xspacing,yspacing,1,0,mask')
+               iret = execute('convMaskArrayAll[*,*,'+strcompress(string(iradius),/remove_all)+      $
+                              '] = mask')
+            endfor 
+
+            if keyword_set(ver) then begin
+               print,'   Done creating convective masks for all radii'
+            endif 
+
+           ;-------------------------------
+           ; Compute background intensities
+           ;-------------------------------
+           background_intensity,refl2dArray,xsize,ysize,maxBdgWinDiameter,winMaskArray,$
+                                missingVal,bkgrndArray
+           if keyword_set(ver) then begin
+              print,'   Done calculating background intensities'
+           endif 
+
+           ;--------------------
+           ; Identify conv cores
+           ;--------------------
+           conv_core_cos_scheme,refl2dArray,bkgrndArray,xsize,ysize,minZdiff,absConvThres, $
+                                truncZconvThres,bkgrndPixelFlag,missingVal,CS_CORE,       $
+                                convCoreArray
+           if keyword_set(ver) then begin
+              print,'   Done identifying convective cores'
+           endif 
+
+           ;-------------------------------------------------------
+           ; Do initial assignment of convsf map & count conv cores
+           ;-------------------------------------------------------
+           make_initial_convsf_map,refl2dArray,convCoreArray,convsfArray, $
+                                   weakEchoThres,minDbzUse,CS_CORE,CONV, $
+                                   WEAK_ECHO,NO_SFC_ECHO,SF,coreCount,   $
+                                   missingVal
+           if keyword_set(ver) then begin
+              print,'   Done with initial assignment of convsf map'
+           endif 
+
+           ;---------------------------------------------------------------------
+           ; REDO THIS SECTION USING ARRAY OPERATIONS
+           ;---------------------------------------------------------------------
+           ; Go through refl2dArray second time to apply conv radius to each core
+           ;---------------------------------------------------------------------
+           convRadCnt = make_array(maxConvRadius,/integer,value=0)
+           for j=0,ysize-1 do begin
+              for i=0,xsize-1 do begin
+                 index = (xsize*j)+i             
+                 if convCoreArray[index] eq CS_CORE then begin
+                                ; Get int value of convRadius so can use as array index
+                    convRadiusKm = assign_conv_radius_km(bkgrndArray[index], $
+                                                         maxConvRadius,      $
+                                                         dBZforMaxConvRadius )
+                    convRadius = fix(floor(convRadiusKm))
+                    ; Define convMaskArray and keep track of how many with each radius
+                    if convRadius ge 1 and convRadius le maxConvRadius then begin
+                       convMaskArray = convMaskArrayAll[*,*,convRadius-1]
+                       convRadCnt[convRadius-1]++
+                    endif else begin
+                       print,'   Unanticipated convMaskArray size, convRadius=',convRadius
+                       print,'   . . . Need to change code for rad > ', $
+                             strcompress(string(maxConvRadius),/remove_all),'. Exiting'
+                       return
+                    endelse 
+                    ; Modify convsfArray to incorporate points within radius
+                    incorporate_conv_radius,convsfArray,i,j,xsize,ysize,  $
+                                            maxConvDiameter,convMaskArray
+                 endif 
+              endfor 
+           endfor 
+           if keyword_set(ver) then begin
+              print,'   Done going through array second time to assign conv radii to cores'
+           endif 
+
+           ;-------------------
+           ; Create border mask
+           ;-------------------
+           ; If applyRadMask set, cut out the corners
+           ; Else put in a border of missingVals on the map since the algorithm 
+           ;   cannot calculate bkgrnd Z properly at edges of map
+           ;   Use in cases where data beyond region of map
+           ;centerMapPixel = fix(floor(xsize/2))
+           if applyRadMask then begin
+              maxMapRadius = (xsize * xspacing)/2.0
+           endif else begin
+              maxMapRadius = (xsize * xspacing)/2.0 - bkgrndRadius
+           endelse
+           if keyword_set(ver) then begin
+              print,'   Applying radial mask out to range = ', $
+                    strcompress(string(maxMapRadius),/remove_all)
+           endif 
+           radial_distance_mask,minRadius,maxMapRadius,xsize,ysize,  $
+                                xspacing,yspacing,1,0,borderMaskArray
+
+           ;------------------
+           ; Apply border mask
+           ;------------------
+           indMask = where(borderMaskArray ne 1,countMask)
+           convsfArray[indMask] = missingVal
+           if keyword_set(ver) then begin
+              print,'   Done creating and applying border mask'
+           endif 
+
+           ;-------------------
+           ; Output netcdf file
+           ;-------------------
+           if keyword_set(nc) then begin
+
+              convsfArray = reform(convsfArray,xsize,ysize)
+
+              ; get output file name
+              inDirLen = strlen(inputDir+'/'+date[idate])
+              inputFn = strmid(files[ifile],inDirLen+1)
+              outputFn = outputDir+'/'+outPrefix+inputFn
+        
+              write_netcdf_file_xyzt,outputFn,xsize,ysize,1,base_time_val,time_offset_val, $
+                                     lat_val,lon_val,level*zspacing,xspacing,yspacing,1,'convsf',  $
+                                     'unitless' ,missingVal,convsfArray,absConvThres,minZdiff,     $
+                                     truncZconvThres,dBZforMaxConvRadius,applyRadMask,minRadius,   $
+                                     mindBZuse,weakEchoThres,bkgrndRadius,maxConvRadius,bkgrndPixelFlag
+
+
+              if keyword_set(ver) then begin
+                 print,'   Done outputing netcdf file'
+              endif 
+
+           endif 
+
+           ;------------------
+           ; Deallocate memory
+           ;------------------
+           reflArray = 0
+           refl2dArray = 0
+           borderMaskArray = 0
+           convsfArray = 0
+           backgrdArray = 0
+           convcoreArray = 0
+           if keyword_set(ver) then begin
+              print,'   Done deallocating memory'
+           endif 
+
+        endfor                  ; for ifile=0,numFiles-1
+
+     endif else begin           ; if numFiles gt 0
+
+        print,'No data files for ',date[idate]
+        
+     endelse 
+
+
+

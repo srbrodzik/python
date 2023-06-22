@@ -1,0 +1,60 @@
+base_path: /home/rmet/SPURS2/realtime_radar
+path1: raw_radar_data
+ftype1: .uf
+prefix1: SEA
+
+path2: realtime_cfradial
+ftype2: .nc
+prefix2: SEA
+
+path3: realtime_gridded
+ftype3: .nc
+prefix3: SEAPOL_grid_
+
+path4: realtime_processed
+ftype4: .nc
+
+nsweeps_thresh: 1
+phase_name: PH
+vel_name: VR
+sq_name: SQ
+dz_name: DZQC
+orig_dz_name: DZ
+zdr_name: DR
+kdp_name: KDP
+orig_kdp_name: KD
+rho_name: RH
+orig_rho_name: RH
+
+sdp_thresh: 13
+despeckle_gates: 4
+sq_thresh: 0.3
+
+lat_width: 2.0
+lon_width: 2.5
+
+lat_width_zoom: 2.0
+lon_width_zoom: 2.0
+
+map_limits:
+  lat: [38.0, 42.5]
+  lon: [-107.0, -102.0]
+
+map_res: 1.0
+
+z_val: 2.0
+
+saved_data_path: test_saved_data
+default_dtime: 4.0
+accum_lag_thresh: 20.0
+
+rain_search_range: 150.0
+rain_search_thresh: 1.0
+
+accum_search_range: 150.0
+accum_search_thresh: 3.0
+
+rainfall_age_thresh: 360.0
+save_data_thresh: 12
+
+rain_method: composite # can be either slant or composite

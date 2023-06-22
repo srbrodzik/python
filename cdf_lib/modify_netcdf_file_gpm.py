@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import netCDF4 as nc4
 import numpy as np
 import time as tm

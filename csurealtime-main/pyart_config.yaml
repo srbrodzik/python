@@ -1,0 +1,134 @@
+# This is where this file and the other python files are located, this shouldn't have to change during the cruise
+# This is for the SEAPOL server
+base_path: /home/brfuchs/radar_analysis
+
+
+# This is here because Vaisala wasn't doing range corrections, ** but for RHIs only ***
+# If this issue gets fixed, then change the flag to 0
+rhi_range_correction: 0
+# This qc_flag is to turn on/off some preliminary QC operations like data cleanup, and some add'l processing
+# like computing the actual correlation coefficient, because the one Vaisala provides is exaggerated
+qc_flag: 1
+# This flag gives you the option to do some preliminary velocity unfolding in realtime
+unfold_flag: 1
+
+# This is needed for HID
+radar_band: 'C'
+
+pause_time: 15 # in seconds, number of seconds the driver script will pause while waiting for a new data file
+file_tdiff_thresh: 480 # In the driver, this is the  number of seconds the directory will look back
+                        # Since it wont overwrite times/files it's already processed, it makes sense to make
+                        # This a fairly large number
+
+# set these phase values for plotting purposes, as these can change somewhat arbitarily
+low_phase: 30
+high_phase: 120
+
+
+#fig_path: /shares/radar_data/projects/spurs2/figures
+#raw_data_path: /shares/radar_data/projects/spurs2/
+
+# ***************************************************************
+# These 2 paths are very important! Make sure these are pointing to a real and correct path
+#
+
+raw_data_path: /shares/radar_data/projects/test
+fig_path: /shares/radar_data/projects/test/figures
+
+# This is the filetype (suffix) of the raw data. Since SIGMET doesn't give one, just put an empty string
+# but in theory, it could be an nc or uf or something like that
+raw_ftype: ''
+
+# This is the path where the raw data is read in and QC'ed and spit out to
+qc_data_path: /shares/radar_data/projects/test/qc_data
+qc_ftype: .nc
+# The prefix is thrown in there for clarity
+qc_prefix: SEA
+
+# After PPI data is QC'ed, it gets gridded, this path tells the code where to put the data and where to read
+# it down the line
+#
+grid_data_path: /shares/radar_data/projects/test/gridded_data
+grid_ftype: .nc
+grid_prefix: SEAPOL_grid_
+
+# This path is where the npz rainfall arrays are located
+rain_data_path: /shares/radar_data/projects/test/rainfall_arrays
+rain_ftype: .npz
+rain_prefix : ''
+
+nsweeps_thresh: 3
+
+orig_phase_name: PHIDP2
+qc_phase_name: PHIDP2
+phase_name: FDP
+
+
+orig_vel_name: VEL2
+qc_vel_name: VEL2
+vel_name: CV
+
+orig_sq_name: SQI2
+qc_vel_name: SQI2
+sq_name: SQI2
+
+# Reflectivity, in DROPS, will undergo a first QC with python, then a final QC with DROPS
+# so it'll have to have 3 different names
+
+# This is the name in the raw data file
+orig_dz_name: DBZ2
+# Here is the Pyart QC'ed reflectivity name
+qc_dz_name: DZQC
+# Here is the final reflectivity name
+dz_name: DZQC
+
+orig_zdr_name: ZDR2
+qc_zdr_name: ZDR
+zdr_name: ZDR2
+
+orig_kdp_name: KDP2
+qc_kdp_name: KDP
+kdp_name: KDP
+
+orig_rho_name: RHOHV2
+qc_rho_name: CC
+rho_name: CC
+
+
+sdp_thresh: 13
+despeckle_gates: 4
+sq_thresh: 0.35
+rho_thresh: 0.85
+
+lat_width: 2.25
+lon_width: 2.5
+
+lat_width_zoom: 1.0
+lon_width_zoom: 1.0
+
+map_limits:
+  lat: [17.5, 26.0]
+  lon: [-123.0, -116.0]
+
+map_res: 1.0
+
+cs_z_val: 4.0
+
+z_val: 2.0
+z_bot: 0.5
+z_top: 3.0
+
+saved_data_path: saved_data
+default_dtime: 5.0
+accum_lag_thresh: 20.0
+
+rain_search_range: 5.0
+rain_search_thresh: 5.0
+
+accum_search_range: 5.0
+accum_search_thresh: 5.0
+
+rainfall_age_thresh: 480.0
+save_data_thresh: 12
+
+rain_method: composite # can be either slant or composite

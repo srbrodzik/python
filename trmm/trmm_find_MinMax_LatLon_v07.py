@@ -6,8 +6,8 @@ import netCDF4 as nc4
 import numpy as np
 
 # User inputs
-indir = '/home/disk/bob/trmm/afc_pr/classify/ex_data_v07'
-months = ['01']
+indir = '/home/disk/bob/trmm/sas_pr/classify/ex_data_v07'
+months = ['02']
 years = ['1998']
 
 minLatitude = 99

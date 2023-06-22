@@ -1,0 +1,186 @@
+# Brody Fuchs, Sept 2017
+# brfuchs@atmos.colostate.edu
+
+
+
+import numpy as np 
+import matplotlib.pyplot as plt 
+from netCDF4 import Dataset
+from glob import glob
+import matplotlib as mpl
+from matplotlib.colors import LogNorm
+
+from csu_radartools import (csu_fhc, csu_liquid_ice_mass, csu_blended_rain, csu_dsd, 
+                            csu_kdp, csu_misc, csu_blended_rain_tropical)
+
+from mpl_toolkits.basemap import Basemap 
+
+import argparse
+from copy import deepcopy
+import datetime
+import time
+import raintype
+from csuram import RadarData, Cell, general_tools, Case, RadarConfig
+from skewt import SkewT
+import cPickle as pickle
+
+
+
+map_limits = {'lat': [39.0, 41.5], 'lon': [-106.0, -103]}
+map_res = 1.0 # km
+
+dlat = map_res/111.0
+dlon = map_res/(111.0*np.cos(np.radians(map_limits['lat'][0])))
+
+nlat = int(np.round((map_limits['lat'][1]-map_limits['lat'][0])/dlat))
+nlon = int(np.round((map_limits['lon'][1]-map_limits['lon'][0])/dlon))
+
+xl = None
+yl = None
+
+
+#outpath = '/Users/brodyfuchs-macbook/code/rainfallmap/realtime_processed'
+radar_path = '/Users/brodyfuchs-macbook/code/rainfallmap/realtime_processed'
+
+# find all radar files in the path
+radar_files = sorted(glob('%s/*.nc'%(radar_path)))
+
+
+# defining the accumulated rainfall array, or list rather
+accum_rainfall = []
+accum_times = []
+
+accum_minute_thresh1 = 30.
+accum_minute_thresh2 = 60.
+rainfall_age_thresh = 5.0 # 10 mm/hr and higher is typically convective
+dtime = 4.0 # minute
+
+z_val = 2.0 # km
+
+for rf in radar_files:
+
+
+    last_dot = rf.rfind('.')
+    dt_string = rf[last_dot-15:last_dot]
+    print dt_string
+    file_time = datetime.datetime.strptime(dt_string, '%Y%m%d_%H%M%S')
+
+    radar = RadarData.RadarData(radar_file=rf, x='x0', y='y0', z='z0', band='C', squeeze=True, 
+                    lat='lat0', lon='lon0', dz='DZQC', kdp='KDP', zdr='DR', rho='RH')
+
+
+    radar.date = file_time
+
+
+    x_0 = np.where(radar.data[radar.x_name] == 0)[0][0]
+    y_0 = np.where(radar.data[radar.y_name] == 0)[0][0]
+
+    radar_lat = radar.data[radar.lat_name][y_0, x_0]
+    radar_lon = radar.data[radar.lon_name][y_0, x_0]
+
+
+    accum_times.append(file_time)
+
+
+    accum_rainfall.append(radar.data['RR']*dtime/60.0)
+
+
+    # okay now do accumulated rainfall for the last 30 minutes
+    tdiffs = np.array([np.abs((_ - file_time).total_seconds()) for _ in accum_times])
+    #print 'tdiffs: {}'.format(tdiffs)
+
+    good_files1 = np.where(tdiffs <= accum_minute_thresh1*60.0)
+    good_files2 = np.where(tdiffs <= accum_minute_thresh2*60.0)
+
+    print 'good files: {}'.format(good_files1)
+
+
+
+    accum_rainfall_good_times1 = np.sum(np.array(accum_rainfall)[good_files1], axis=0)
+    accum_rainfall_good_times2 = np.sum(np.array(accum_rainfall)[good_files2], axis=0)
+
+    radar.add_field(accum_rainfall_good_times1, 'ACCRR30')
+    radar.add_field(accum_rainfall_good_times2, 'ACCRR60')
+
+
+
+
+
+    # ***** Alright, now how do I do the rainfall age thing??
+
+    rainfall_age = np.zeros_like(radar.data['RR'])
+    rainfall_age = np.ma.masked_where(rainfall_age == 0.0, rainfall_age)
+
+    # set to 0's here
+    accrain_array = np.array(accum_rainfall)
+    enough_rain = np.where(accrain_array >= rainfall_age_thresh)
+
+    # now need to loop thru each entry in enough_rain
+    xy_pairs = zip(enough_rain[1], enough_rain[2])
+
+    uniq_xy_pairs = list(set(xy_pairs))
+
+
+
+    for pt in uniq_xy_pairs:
+        # pt is an x,y pair
+        all_pts = np.where( (enough_rain[1] == pt[0]) & (enough_rain[2] == pt[1]) )
+        t_inds_thresh = enough_rain[0][all_pts[0]]
+        last_t = t_inds_thresh[-1]
+        this_age = (len(accum_rainfall) - last_t)*dtime
+        rainfall_age[pt] = this_age
+
+
+
+
+
+    radar.add_field(rainfall_age, 'RRAGE')
+
+
+
+    fig, ax = radar.cappi_multiplot(z=2.0, varlist=['DZ', 'DR', 'KDP', 'RH', 'CS', 'HID'], coords='ll', xlim=xl, ylim=yl)
+    plt.show()
+
+
+
+    fig, ax = plt.subplots(2,2, figsize=(10,8))
+    axf = ax.flatten()
+
+    rr_pc = radar.cappi('RR', z=z_val, ax=axf[0], cmap=plt.cm.BuPu, norm=LogNorm(vmin=1e-1, vmax=100), coords='ll', xlim=xl, ylim=yl)
+    axf[0].set_title('Instantaneous rain rate (mm/hr)')
+
+    arr_pc1 = radar.cappi('ACCRR30', z=z_val, ax=axf[1], cmap=plt.cm.afmhot_r, norm=LogNorm(vmin=1e-1, vmax=100), coords='ll', 
+                                                    xlim=xl, ylim=yl)
+
+    #    arr_cb1 = plt.colorbar(arr_pc1, orientation='vertical', ax=axf[1], fraction=cb_frac, pad=cb_pad)
+    axf[1].set_title('30 min accum rainfall (mm)')
+
+    arr_pc2 = radar.cappi('ACCRR60', z=z_val, ax=axf[2], cmap=plt.cm.afmhot_r, norm=LogNorm(vmin=1e-1, vmax=100), coords='ll', 
+                                            xlim=xl, ylim=yl)
+
+    # arr_pc2 = axf[2].pcolormesh(radar.data['lon0'], radar.data['lat0'], accum_rainfall_good_times2, 
+    #                 cmap=plt.cm.afmhot_r, norm=LogNorm(vmin=1e-1, vmax=100))
+    #    arr_cb2 = plt.colorbar(arr_pc2, orientation='vertical', ax=axf[2], fraction=cb_frac, pad=cb_pad)
+    axf[2].set_title('60 min accum rainfall (mm)')
+
+    rrage_pc = radar.cappi('RRAGE', z=z_val, ax=axf[3], cmap=plt.cm.jet, vmin=0.0, vmax=25.0, coords='xy', xlim=xl, ylim=yl)
+
+    #    rrage_cb3 = plt.colorbar(rrage_pc, orientation='vertical', ax=axf[3], fraction=cb_frac, pad=cb_pad)
+    axf[3].set_title('Rainfall age using %d mm threshold'%(rainfall_age_thresh))
+
+    for a in axf:
+        a.grid(True)
+        a.scatter(radar_lon, radar_lat, s=80, facecolor='MediumPurple')
+
+
+    plt.tight_layout()
+
+
+
+    plt.savefig('rain_figs/%s_rraccum.png'%(dt_string))
+
+    plt.close(fig)
+
+
+    quit()
+

@@ -3,8 +3,8 @@
 import os
 import sys
 
-indir = '/home/disk/bob/gpm/nam_imp_ku/classify/ex_data_v06/2021/02'
-outdir = '/home/disk/bob/impacts/raw/gpm_ku/202102'
+indir = '/home/disk/bob/gpm/nam_imp_ku/classify/ex_data_v07/2023/02'
+outdir = '/home/disk/bob/impacts/raw/gpm_ku/202302'
 #indir = '/home/disk/shear2/brodzik/gpm/PMMproposal'
 #outdir = '/home/disk/shear2/brodzik/gpm/PMMproposal/reducedAlts'
 

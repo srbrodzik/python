@@ -1,0 +1,91 @@
+def assign_conv_radius_km(bkgrndVal,maxConvRadius,dBZforMaxConvRadius):
+
+    import sys
+
+    # PURPOSE: from SHY algorithm based on the reflectivity of the background 
+    # assigns the convective radius in KILOMETERS
+    # for SHY algorithm as published
+    # maxconvradius = 5 km i.e convcore pixel plus 2 pixels if 2 km size pixels
+    # dBZforMaxConvRadius = 40
+    # note as coded, which is similar to Steiner code,
+    # pretty much assumes that maxconvradius = 5 km
+
+    # INPUTS:
+    #       bkgrndVal           = average refl val of background pixels
+    #       maxConvRadius       = maximum convective radius (in km)
+    #       dBZforMaxConvRadius = min core dBZ for max conv radius mask
+    # OUTPUTS:
+    #       convRadius          = convective radius
+
+    if bkgrndVal >= dBZforMaxConvRadius:
+        convRadiusKm=maxConvRadius
+    elif bkgrndVal >= dBZforMaxConvRadius-5:
+        convRadiusKm=maxConvRadius-1
+    elif bkgrndVal >= dBZforMaxConvRadius-10:
+        convRadiusKm=maxConvRadius-2
+    elif bkgrndVal >= dBZforMaxConvRadius-15:
+        convRadiusKm=maxConvRadius-3
+    else:
+        convRadiusKm=maxConvRadius-4
+
+    return convRadiusKm
+
+def radial_distance_mask(min_radius,max_radius,x_dim,y_dim,x_res,y_res):
+    
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # PURPOSE:
+    #       Creates either a circular mask for cartesian grid
+
+    # INPUTS:
+    #       min_radius = min radius of mask in km
+    #       max_radius = max radius of mask in km
+    #       x_dim      = size of x dimension
+    #       y_dim      = size of y dimension
+    #       x_res      = spacing between grid points in x direction
+    #       y_res      = spacing between grid points in y direction
+
+    # OUTPUTS:
+    #       mask      = 2d cartesian mask
+
+    debug = 1
+    
+    x_start = -(x_dim/2)+(x_res/2)   
+    x_end   = (x_dim/2)-(x_res/2)   
+    y_start = -(y_dim/2)+(y_res/2)   
+    y_end   = (y_dim/2)-(y_res/2)
+
+    x0 = x_start + x_end
+    y0 = y_start + y_end
+    
+    x = np.linspace(x_start, x_end, x_dim)
+    y = np.linspace(y_start, y_end, y_dim)
+
+    x, y = np.meshgrid(x, y)
+    r = np.sqrt((x - x0)**2 + (y - y0)**2)
+
+    mask = np.logical_and(r > min_radius, r < max_radius)
+
+    if debug:
+        fig, ax = plt.subplots()
+        ax.set(xlabel='X', ylabel='Y', aspect=1.0)
+
+        ax.scatter(x[mask], y[mask])
+
+        plt.show()
+
+    return mask
+
+def background_intensity(reflArray,xsize,ysize,winDiam,mask):
+
+    # INPUTS:
+    #       refl_array = 2d reflectivity
+    #       x_dim      = x dimension of reflArray
+    #       y_dim      = y dimension of reflArray
+    #       win_diam   = num pixels in mask diam
+    #       mask       = background mask
+    # OUTPUTS:
+    #       bgArray    = background averages
+
+    return "Testing"

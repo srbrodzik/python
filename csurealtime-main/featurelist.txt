@@ -1,0 +1,23 @@
+Features for the rainfall mapping project
+
+- Know where radar is (lat/lon) and display
+- QC data before sending to RadX
+- make QC'ed radar images on the fly for each radar scan
+- HID using Dolan algorithm 
+- Do our own Kdp calculation
+- Accumulated rainfall over the last 30 min/60 min
+- Age of rainfall at a given point (time since it rained over some threshold)
+- Interactive display (GUI)
+	- cursors, panning, zooming
+- Tracking
+	- nowcasting, other features
+
+
+
+####### File workflow #######
+- Raw UF files will come in from somewhere
+- Need to run QC (qc_radar.py) on the new radar file, which gets stored in realtime_cfradial
+- Then run RadXConvert to grid the QC'ed data, spit those files out in realtime_gridded
+- Then run the python script that will do the HID, rain fall calculations
+	- This will require a sounding, will have to think about how to do that. Maybe have a standard one as a default
+- Maybe then have a cell tracking/GUI on those fully processed files
